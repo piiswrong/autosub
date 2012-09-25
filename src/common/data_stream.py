@@ -10,8 +10,8 @@ class data_stream_handle(object):
         self.pos = 0
         self.i = 0
     
-    def read(self, n = float('inf')):
-        return self.stream.read(self, n)
+    def read(self, n = float('inf'), res = []):
+        return self.stream.read(self, n, res)
 
     def write(self, data):
         return self.stream.write(data)
@@ -20,7 +20,7 @@ class data_stream(object):
     """
     Interface that holds and transfers data between processors.    
     """
-    def __init__(self, sample_rate, total_samples = None, max_queue_count = float('inf')):
+    def __init__(self, sample_rate, total_samples = float('inf'), max_queue_count = float('inf')):
         self.sample_rate = sample_rate
         self.total_samples = total_samples
         
@@ -45,9 +45,9 @@ class data_stream(object):
     def get_total_samples(self):
         return self.total_samples
     
-    def read(self, handle, n = float('inf')):
+    def read(self, handle, n = float('inf'), res = []):
         self.lock.acquire()
-        
+            
         while self.tail_pos - handle.pos < n:
             self.write_event.clear()
             self.lock.release()
@@ -55,7 +55,7 @@ class data_stream(object):
             self.lock.acquire()
 
         total_read = 0
-        res = []
+
         while handle.i - self.head_i < self.queue.count() and total_read < n:
             tmp = self.queue[handle.i - self.head_i]
             handle.i = handle.i + 1
