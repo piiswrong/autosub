@@ -75,7 +75,7 @@ class data_stream(object):
     def write(self, data):
         self.lock.acquire()
         self.running = True
-        while self.queue.count() == self.max_queue_count:
+        while len(self.queue) == self.max_queue_count:
             self.read_event.clear()
             self.lock.release()
             self.read_event.wait()
