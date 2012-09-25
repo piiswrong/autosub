@@ -30,8 +30,8 @@ class audio_decoder(processor):
             raise "no audio track found in given media file!"
         
         self.resampler = sound.Resampler( (dm.streams[ aindex ][ 'sample_rate' ], dm.streams[ aindex ][ 'channels' ]), 
-                                          (dm.streams[ aindex ][ 'sample_rate' ], 1) )
-        self.ostream = data_stream(dm.streams[self.aindex]['sample_rate'])
+                                          (AUDIO_SAMPLE_RATE , 1) )
+        self.ostream = data_stream(AUDIO_SAMPLE_RATE)
         self.odtype = np.int16
         self.demuxer = dm
         self.frames = r
@@ -47,24 +47,10 @@ class audio_decoder(processor):
                         data = self.resampler.resample(r.data)
                         data = np.fromstring(data, dtype = self.odtype)
                         self.ostream.write(data)
-                        print data
+                        #print data
                         
             s = self.fin.read(512)
             if len(s) == 0:
                 break
             frames = self.demuxer.parse(s)
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
         

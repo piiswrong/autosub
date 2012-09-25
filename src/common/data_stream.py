@@ -56,7 +56,7 @@ class data_stream(object):
 
         total_read = 0
 
-        while handle.i - self.head_i < self.queue.count() and total_read < n:
+        while handle.i - self.head_i < len(self.queue) and total_read < n:
             tmp = self.queue[handle.i - self.head_i]
             handle.i = handle.i + 1
             total_read = total_read + len(tmp)
