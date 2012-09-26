@@ -16,7 +16,7 @@ class spectrum(processor_np):
         self.w = scipy.hamming(self.window_size)
         
     def work(self, buff, size, pos):
-        data = np.asarray([ abs(scipy.fft(buff[i:i+self.window_size]*self.w)[:self.window_size/2]) \
+        data = np.asarray([ abs(scipy.fft(buff[i:i+self.window_size]*self.w)[:self.window_size/2])**2 \
                             for i in xrange(0, size - self.window_size + 1, self.shift_dist) ])
         self.ostream.write(data)
         #plt.imshow(data.T)

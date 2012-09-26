@@ -15,6 +15,9 @@ class data_stream_handle(object):
 
     def write(self, data):
         return self.stream.write(data)
+    
+    def get_time(self, pos):
+        return self.stream.get_time(pos)
 
 class data_stream(object):
     """
