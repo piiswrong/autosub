@@ -31,7 +31,7 @@ class audio_decoder(processor):
         
         self.resampler = sound.Resampler( (dm.streams[ aindex ][ 'sample_rate' ], dm.streams[ aindex ][ 'channels' ]), 
                                           (AUDIO_SAMPLE_RATE , 1) )
-        self.ostream = data_stream(AUDIO_SAMPLE_RATE)
+        self.ostream = data_stream(AUDIO_SAMPLE_RATE, data_format = {'dtype':np.int16})
         self.odtype = np.int16
         self.demuxer = dm
         self.frames = r
@@ -52,4 +52,6 @@ class audio_decoder(processor):
             if len(s) == 0:
                 break
             frames = self.demuxer.parse(s)
+        self.ostream.finish_writing()
+        print 'dec finish'
         

@@ -20,9 +20,10 @@ class data_stream(object):
     """
     Interface that holds and transfers data between processors.    
     """
-    def __init__(self, sample_rate, total_samples = float('inf'), max_queue_count = float('inf')):
+    def __init__(self, sample_rate, total_samples = float('inf'), max_queue_count = float('inf'), data_format = {}):
         self.sample_rate = sample_rate
         self.total_samples = total_samples
+        self.data_format = data_format
         
         self.lock = threading.Lock()
         self.write_event = threading.Event()
@@ -33,7 +34,16 @@ class data_stream(object):
         self.tail_pos = 0
         self.head_i = 0
         self.handles = []
-        self.running = False        
+        self.running = False
+        
+    def finish_writing(self,):
+        self.lock.acquire()
+        self.total_samples = self.tail_pos
+        self.write_event.set()
+        self.lock.release()
+        
+    def get_time(self, pos):
+        return pos/self.sample_rate        
         
     def get_handle(self):
         if self.running:
@@ -49,10 +59,16 @@ class data_stream(object):
         self.lock.acquire()
             
         while self.tail_pos - handle.pos < n:
+            if self.total_samples - handle.pos < n:
+                n = self.total_samples - handle.pos
+                if self.total_samples == self.tail_pos:
+                    break
             self.write_event.clear()
             self.lock.release()
             self.write_event.wait()
             self.lock.acquire()
+            
+
 
         total_read = 0
 
