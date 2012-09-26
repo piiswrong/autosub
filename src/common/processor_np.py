@@ -27,6 +27,7 @@ class processor_np(processor):
         while self.istream_handle.pos < self.istream.total_samples or queue.count():
             if self.istream_handle.pos < self.istream.total_samples:
                 pos, n, queue = self.istream_handle.read(self.buff_size - tail, queue)
+                print pos, n, self.buff_size - tail
             while tail < self.buff_size:
                 tmp = queue.popleft()
                 if len(tmp) <= self.buff_size - tail:
@@ -39,4 +40,5 @@ class processor_np(processor):
                     
             self.work(buff, tail, pos)
             buff[:self.resid_size] = buff[self.buff_size - self.resid_size:]
+            tail = self.resid_size
             

@@ -47,7 +47,6 @@ class audio_decoder(processor):
                         data = self.resampler.resample(r.data)
                         data = np.fromstring(data, dtype = self.odtype)
                         self.ostream.write(data)
-                        #print data
                         
             s = self.fin.read(512)
             if len(s) == 0:
