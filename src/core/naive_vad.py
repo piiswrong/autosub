@@ -15,8 +15,8 @@ class naive_vad_score(processor_np):
         
         
     def work(self, buff, size, pos):
-        #data = np.concatenate((np.asarray([ self.process_frame(buff[i]) for i in xrange(size) ]).reshape((size,1)), buff[:size]), axis = 1)
-        data = np.asarray([ self.process_frame(buff[i]) for i in xrange(size) ])        
+        data = np.concatenate((np.asarray([ self.process_frame(buff[i]) for i in xrange(size) ]).reshape((size,1)), buff[:size]), axis = 1)
+        #data = np.asarray([ self.process_frame(buff[i]) for i in xrange(size) ])        
         self.ostream.write(data)
         
     def process_frame(self, frame):
@@ -39,15 +39,15 @@ class naive_vad_score(processor_np):
         
 class naive_vad_decision(processor_np):
     def __init__(self, istream_handle):
-        super(naive_vad_decision, self).__init__(istream_handle, 100, 0, (), istream_handle.stream.data_format['dtype'])
+        super(naive_vad_decision, self).__init__(istream_handle, 500, 0, (129,), istream_handle.stream.data_format['dtype'])
         self.ostream = data_stream(float('inf'))        
         self.Ts = None
-        self.init_len = min(5, self.buff_size)
+        self.init_len = min(10, self.buff_size)
         self.mu = 0
         self.sigma = 0
         self.H = None
-        self.alpha = 0.0
-        self.beta = 0.9
+        self.alpha = 0.5
+        self.beta = 0.99
         self.speech = False
         self.max_sep = int(0.2*istream_handle.stream.sample_rate)
         self.sep = 0
@@ -59,6 +59,14 @@ class naive_vad_decision(processor_np):
         self.count = 0
         
     def work(self, buff, size, pos):
+        plt.subplot(211)
+        plt.imshow(buff.T)
+        plt.gray()
+        plt.subplot(212)
+        plt.plot(xrange(size), buff[:size,0])
+        plt.show()
+        return
+        
         if self.Ts is None:
             init = buff[:self.init_len]
             self.mu = init.mean()
@@ -68,7 +76,7 @@ class naive_vad_decision(processor_np):
             self.Ts = self.mu + self.alpha*self.sigma
 
         for i in xrange(size):
-            #print pos + i, self.mu, self.sigma, buff[i], self.Ts
+            print pos + i, buff[i], self.Ts, self.sigma, self.mu
             if buff[i] > self.Ts:
                 if not self.speech:
                     self.start_point = pos + i
@@ -93,7 +101,7 @@ class naive_vad_decision(processor_np):
                             
                             
                 self.mu = self.beta*self.mu + (1-self.beta)*buff[i]
-                H = self.beta*self.H.mean()+(1-self.beta)*(buff[i]**2)
+                H = self.beta*self.H.mean() + (1-self.beta)*(buff[i]**2)
                 self.sigma = np.sqrt(abs(H**2-self.mu**2))
                 self.H[self.H_ind] = buff[i]**2
                 self.H_ind = (self.H_ind + 1)%self.init_len

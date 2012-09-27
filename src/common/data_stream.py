@@ -16,8 +16,8 @@ class data_stream_handle(object):
     def write(self, data):
         return self.stream.write(data)
     
-    def get_time(self, pos):
-        return self.stream.get_time(pos)
+    def get_time(self, pos, window = 1):
+        return self.stream.get_time(pos, window)
 
 class data_stream(object):
     """
@@ -45,8 +45,8 @@ class data_stream(object):
         self.write_event.set()
         self.lock.release()
         
-    def get_time(self, pos):
-        return pos/self.sample_rate        
+    def get_time(self, pos, window = 1):
+        return (pos + window - 1)/self.sample_rate        
         
     def get_handle(self):
         if self.running:
