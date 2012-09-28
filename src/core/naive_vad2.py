@@ -58,8 +58,8 @@ class naive_vad(processor_np):
         
         while len(self.start_end) > 1:
             print self.start_end[0], self.start_end[1]
-            seg = ((self.start_end[0]*self.frame_shift + self.frame_len/2)/1000, (self.start_end[0]*self.frame_shift + self.frame_len/2)/1000)
-            print seg            
+            seg = ((self.start_end[0]*self.frame_shift + self.frame_len/2)/1000.0, (self.start_end[1]*self.frame_shift + self.frame_len/2)/1000.0)
+            #print seg            
             self.ostream.write(seg)
             self.start_end = self.start_end[2:]
             seg = (int(seg[0]*100), int(seg[1]*100))
@@ -131,6 +131,7 @@ class naive_vad(processor_np):
             for i in xrange(1, len(fragment)-1, 2):
                 if fragment[i+1]-fragment[i] < self.max_word_pause / self.frame_shift:
                     fragment = fragment[:i] + fragment[i+2:]
+                    bmerge = True
                     break
                 
         if not self.bin_speech:
