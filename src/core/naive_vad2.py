@@ -46,8 +46,8 @@ class naive_vad(processor_np):
         super(naive_vad, self).__init__(istream_handle, self.isample_per_frame*self.iframe_per_segment, 0, (), istream_handle.stream.data_format['dtype'])
         self.ostream = data_stream(0)        
         
-        self.count = 0
-        self.fout = open('demo.srt', 'w')
+        #self.count = 0
+        #self.fout = open('../data/social.srt', 'w')
         
     def work(self, buff, size, pos):
         iframe_loaded = self.load_frame_energy(buff, size)
@@ -57,15 +57,16 @@ class naive_vad(processor_np):
         self.icur_frame = self.icur_frame + iframe_loaded
         
         while len(self.start_end) > 1:
-            print self.start_end[0], self.start_end[1]
+            #print self.start_end[0], self.start_end[1]
             seg = ((self.start_end[0]*self.frame_shift + self.frame_len/2)/1000.0, (self.start_end[1]*self.frame_shift + self.frame_len/2)/1000.0)
-            #print seg            
-            self.ostream.write(seg)
+            #print 'vad', seg            
+            self.ostream.write([seg])
             self.start_end = self.start_end[2:]
-            seg = (int(seg[0]*100), int(seg[1]*100))
-            self.count = self.count + 1
-            self.fout.write("%d\n%02d:%02d:%02d,%03d --> %02d:%02d:%02d,%03d\n%d\n\n" % (self.count, seg[0]/360000, (seg[0]%360000)/6000, (seg[0]%6000)/100, (seg[0]%100)*10, seg[1]/360000, (seg[1]%360000)/6000, (seg[1]%6000)/100, (seg[1]%100)*10, self.count))
-    
+
+#            seg = (int(seg[0]*100), int(seg[1]*100))
+#            self.count = self.count + 1
+#            self.fout.write("%d\n%02d:%02d:%02d,%03d --> %02d:%02d:%02d,%03d\n%d\n\n" % (self.count, seg[0]/360000, (seg[0]%360000)/6000, (seg[0]%6000)/100, (seg[0]%100)*10, seg[1]/360000, (seg[1]%360000)/6000, (seg[1]%6000)/100, (seg[1]%100)*10, self.count))
+#    
     def apply_lamel_rules(self, iframe_loaded, pos, k):
         istate = self.istate
         peak_E = self.peak_E
@@ -212,6 +213,7 @@ class naive_vad(processor_np):
         
         l = self.segment_E[:iframe_loaded].tolist()
         l.sort()
+        
         m2_old = np.asarray([[sum(l[:iframe_loaded/2])/(iframe_loaded/2)], [sum(l[iframe_loaded/2:])/(iframe_loaded - iframe_loaded/2)]])
         
         while True:

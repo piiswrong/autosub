@@ -4,6 +4,7 @@ from pymedia import muxer as muxer
 from pymedia.audio import acodec
 from pymedia.audio import sound
 import numpy as np
+from common import constants
 
 class audio_decoder(processor):
     """
@@ -17,9 +18,10 @@ class audio_decoder(processor):
         fin = open(file_name, 'rb')
         if not fin:
             raise "cannot find file %s" % file_name
-        s = fin.read(300000)
+        s = fin.read(3000000)
         r = dm.parse(s)
         
+        print dm.streams
         self.decoder = None
         for aindex in xrange( len( dm.streams )):
           if dm.streams[ aindex ] and dm.streams[ aindex ][ 'type' ]== muxer.CODEC_TYPE_AUDIO:
@@ -30,8 +32,8 @@ class audio_decoder(processor):
             raise "no audio track found in given media file!"
         
         self.resampler = sound.Resampler( (dm.streams[ aindex ][ 'sample_rate' ], dm.streams[ aindex ][ 'channels' ]), 
-                                          (AUDIO_SAMPLE_RATE , 1) )
-        self.ostream = data_stream(AUDIO_SAMPLE_RATE, data_format = {'dtype':np.int16})
+                                          (constants.AUDIO_SAMPLE_RATE , 1) )
+        self.ostream = data_stream(constants.AUDIO_SAMPLE_RATE, data_format = {'dtype':np.int16})
         self.odtype = np.int16
         self.demuxer = dm
         self.frames = r

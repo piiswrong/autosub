@@ -20,16 +20,19 @@ class processor_np(processor):
 
     def work(self, buff, size, pos):
         pass
+
+    def finish_up(self):
+        pass
     
     def run(self):
         buff = np.zeros((self.buff_size,) + self.observation_shape, dtype = self.dtype)
         tail = self.resid_size
         queue = collections.deque()
         pos = -self.resid_size
-        while self.istream_handle.pos < self.istream.total_samples or len(queue):
-            if self.istream_handle.pos < self.istream.total_samples:
+        while self.istream_handle.more_data() or len(queue):
+            if self.istream_handle.more_data():
                 tpos, n, queue = self.istream_handle.read(self.buff_size - tail, queue)
-                #print pos, n, self.buff_size - tail
+                
             while tail < self.buff_size and len(queue):
                 tmp = queue.popleft()
                 if len(tmp) <= self.buff_size - tail:
@@ -47,4 +50,5 @@ class processor_np(processor):
                 tail = self.resid_size
         if self.ostream:
             self.ostream.finish_writing()
+        self.finish_up()
         print 'proc finish'

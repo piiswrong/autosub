@@ -10,7 +10,9 @@ class data_stream_handle(object):
         self.pos = 0
         self.i = 0
     
-    def read(self, n = float('inf'), res = []):
+    def read(self, n = float('inf'), res = None):
+        if res is None:
+            res = []
         return self.stream.read(self, n, res)
 
     def write(self, data):
@@ -18,6 +20,9 @@ class data_stream_handle(object):
     
     def get_time(self, pos, window = 1):
         return self.stream.get_time(pos, window)
+        
+    def more_data(self):
+        return self.pos < self.stream.total_samples
 
 class data_stream(object):
     """
@@ -58,7 +63,9 @@ class data_stream(object):
     def get_total_samples(self):
         return self.total_samples
     
-    def read(self, handle, n = float('inf'), res = []):
+    def read(self, handle, n = float('inf'), res = None):
+        if res is None:
+            res = []
         self.lock.acquire()
             
         while self.tail_pos - handle.pos < n:

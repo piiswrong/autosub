@@ -3,7 +3,7 @@ from common.data_stream import *
 import numpy as np
 import scipy
 import matplotlib.pyplot as plt
-
+from common import constants
 class spectrum(processor_np):
     def __init__(self, istream_handle):
         self.window_size = 256
@@ -12,7 +12,7 @@ class spectrum(processor_np):
         buff_size = self.window_size + (self.batch_size - 1) * self.shift_dist
         super(spectrum, self).__init__(istream_handle, buff_size, self.window_size - self.shift_dist, (), istream_handle.stream.data_format['dtype'])
         
-        self.ostream = data_stream(AUDIO_SAMPLE_RATE/float(self.shift_dist), data_format = {'shape':(self.window_size/2,), 'dtype':np.double})
+        self.ostream = data_stream(constants.AUDIO_SAMPLE_RATE/float(self.shift_dist), data_format = {'shape':(self.window_size/2,), 'dtype':np.double})
         self.w = scipy.hamming(self.window_size)
         
     def work(self, buff, size, pos):
