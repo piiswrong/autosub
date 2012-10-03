@@ -1,7 +1,6 @@
 from common.processor_np import *
 from common.data_stream import *
 import numpy as np
-from scipy.cluster.vq import kmeans
 
 
 
@@ -76,10 +75,11 @@ class naive_vad(processor_np):
         
         for i in xrange(iframe_loaded):
             E = self.segment_E[i]
-            
+            #print A[1], istate
             if istate == 1:
                 if bcircle_done:
-                    assert A[1] >= -self.iframe_per_segment and A[2] >= A[1] and A[3] >= A[2] and A[4] >= A[3] and peak_E > 0
+                    
+                    #assert A[1] >= -self.iframe_per_segment and A[2] >= A[1] and A[3] >= A[2] and A[4] >= A[3] and peak_E > 0
                     if A[2]-A[1] > self.breath_len:
                         start = A[2]
                     else:
@@ -207,6 +207,7 @@ class naive_vad(processor_np):
             
     
     def kmeans_clustering(self, iframe_loaded):
+
         m1 = self.segment_E.mean()
         gstd = self.segment_E.std()
         clust_dis1 = abs(self.segment_E - m1).sum()/(iframe_loaded*gstd)
@@ -215,11 +216,11 @@ class naive_vad(processor_np):
         l.sort()
         
         m2_old = np.asarray([[sum(l[:iframe_loaded/2])/(iframe_loaded/2)], [sum(l[iframe_loaded/2:])/(iframe_loaded - iframe_loaded/2)]])
-        
+
         while True:
             dist = abs(self.segment_E - m2_old)
-            c0 = 0
-            c1 = 0
+            c0 = 0.00000001
+            c1 = 0.00000001
             m2_0 = 0.0
             m2_1 = 0.0
             for i in xrange(iframe_loaded):

@@ -1,5 +1,6 @@
 import threading
 import collections
+from common import constants
 
 class data_stream_handle(object):
     """
@@ -10,7 +11,7 @@ class data_stream_handle(object):
         self.pos = 0
         self.i = 0
     
-    def read(self, n = float('inf'), res = None):
+    def read(self, n = constants.MAX_INT, res = None):
         if res is None:
             res = []
         return self.stream.read(self, n, res)
@@ -28,7 +29,7 @@ class data_stream(object):
     """
     Interface that holds and transfers data between processors.    
     """
-    def __init__(self, sample_rate, total_samples = float('inf'), max_queue_count = float('inf'), data_format = {}):
+    def __init__(self, sample_rate, total_samples = constants.MAX_INT, max_queue_count = constants.MAX_INT, data_format = {}):
         self.sample_rate = sample_rate
         self.total_samples = total_samples
         self.data_format = data_format
@@ -63,7 +64,7 @@ class data_stream(object):
     def get_total_samples(self):
         return self.total_samples
     
-    def read(self, handle, n = float('inf'), res = None):
+    def read(self, handle, n = constants.MAX_INT, res = None):
         if res is None:
             res = []
         self.lock.acquire()

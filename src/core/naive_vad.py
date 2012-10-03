@@ -2,7 +2,6 @@ from common.processor_np import *
 from common.data_stream import *
 from core.spectrum import *
 import numpy as np
-import matplotlib.pyplot as plt
 import collections
 
 class naive_vad_score(processor_np):
@@ -59,6 +58,7 @@ class naive_vad_decision(processor_np):
         self.count = 0
         
     def work(self, buff, size, pos):
+        """
         plt.subplot(211)
         plt.imshow(buff.T)
         plt.gray()
@@ -66,7 +66,7 @@ class naive_vad_decision(processor_np):
         plt.plot(xrange(size), buff[:size,0])
         plt.show()
         return
-        
+        """
         if self.Ts is None:
             init = buff[:self.init_len]
             self.mu = init.mean()
