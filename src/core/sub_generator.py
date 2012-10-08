@@ -4,8 +4,8 @@ from common import constants
 import time
 import json
 import os
+import tempfile
 import urllib2
-import urllib
 
 class sub_generator(processor):
     
@@ -24,15 +24,23 @@ class sub_generator(processor):
                 break
             seg = seg[0][0]
             print 'sub', seg
-            tmp_file = '%s/tmp_%d.flac' % (constants.TMP_PATH, time.clock())
+            
+            tmp_file = tempfile.mktemp('.flac')
             args = [constants.FFMPEG_PATH, '-v', '0', '-y', '-i', self.infile, '-ss', str(seg[0]-0.3), '-t', str(seg[1]-seg[0]+0.6), '-vn', '-ar', str(constants.GOOGLE_AUDIO_SAMPLE_RATE), '-ac', '1', '-f', 'flac', tmp_file]       
             ffmpeg = subprocess.Popen(args)
             ffmpeg.wait()
-            args = [constants.CURL_PATH, '-k', '--data-binary', '@' + tmp_file, '--header', 'Content-type: audio/x-flac; rate=16000', 'https://www.google.com/speech-api/v1/recognize?xjerr=1&client=chromium&pfilter=2&lang=en-US&maxresults=6']
-            curl = subprocess.Popen(args, stdout = subprocess.PIPE)           
-            curl.wait()
+            url = 'https://www.google.com/speech-api/v1/recognize?xjerr=1&client=chromium&pfilter=2&lang=en-US&maxresults=6'
+            length = os.path.getsize(tmp_file)
+            flac = open(tmp_file, 'rb')
+            req = urllib2.Request(url, data = flac)
+            req.add_header('Content-length', '%d' % length)
+            req.add_header('Content-type', 'audio/x-flac; rate=16000')
+            try:
+                data = urllib2.urlopen(req).read().strip()
+            except :
+                pass
+            flac.close()
             os.remove(tmp_file)
-            data = curl.communicate()[0]
             try:
                 obj = json.loads(data)
                 text = obj['hypotheses'][0]['utterance']
@@ -52,9 +60,7 @@ class sub_generator(processor):
                     conn = urllib2.urlopen(url = 'https://datamarket.accesscontrol.windows.net/v2/OAuth2-13?', data = post_data)
                     obj = json.loads(conn.read())
                     token = obj['access_token']
-            
-                                    
-    
+
             seg = (int(seg[0]*100), int(seg[1]*100))
             count = count + 1
             fout.write("%d\n%02d:%02d:%02d,%03d --> %02d:%02d:%02d,%03d\n%s\n\n" % (count, seg[0]/360000, (seg[0]%360000)/6000, (seg[0]%6000)/100, (seg[0]%100)*10, seg[1]/360000, (seg[1]%360000)/6000, (seg[1]%6000)/100, (seg[1]%100)*10, text))

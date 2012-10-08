@@ -1,9 +1,8 @@
 from common.processor_np import *
 from common.data_stream import *
-import numpy as np
-import scipy
-import matplotlib.pyplot as plt
+import numpy as npcmd
 from common import constants
+
 class spectrum(processor_np):
     def __init__(self, istream_handle):
         self.window_size = 256
@@ -16,7 +15,7 @@ class spectrum(processor_np):
         self.w = scipy.hamming(self.window_size)
         
     def work(self, buff, size, pos):
-        data = np.asarray([ abs(scipy.fft(buff[i:i+self.window_size]*self.w)[:self.window_size/2])**2 \
+        data = np.asarray([ abs(numpy.fft.fft(buff[i:i+self.window_size]*self.w)[:self.window_size/2])**2 \
                             for i in xrange(0, size - self.window_size + 1, self.shift_dist) ])
         self.ostream.write(data)
         #plt.imshow(data.T)
