@@ -20,4 +20,5 @@ class ffmpeg_decoder(processor):
                 break
             self.ostream.write(np.fromstring(s, dtype = self.odtype))
         self.ostream.finish_writing()
-        print 'dec finish'
+        if constants.DEBUG:
+            print 'dec finish'

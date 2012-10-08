@@ -51,4 +51,5 @@ class processor_np(processor):
         if self.ostream:
             self.ostream.finish_writing()
         self.finish_up()
-        print 'proc finish'
+        if constants.DEBUG:
+            print 'proc finish'

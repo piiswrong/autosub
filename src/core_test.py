@@ -4,6 +4,7 @@ import core.sub_generator as sg
 import core.spectrum as spec
 from core.naive_vad2 import *
 
+constants.DEBUG = True
 
 dec = fd.ffmpeg_decoder('../data/demo.mp4')
 vad = naive_vad(dec.ostream.get_handle())
