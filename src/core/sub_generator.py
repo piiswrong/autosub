@@ -4,6 +4,8 @@ from common import constants
 import time
 import json
 import os
+import urllib2
+import urllib
 
 class sub_generator(processor):
     
@@ -33,15 +35,31 @@ class sub_generator(processor):
             data = curl.communicate()[0]
             try:
                 obj = json.loads(data)
-                trans = obj['hypotheses'][0]['utterance']
+                text = obj['hypotheses'][0]['utterance']
             except:
-                trans = ''
+                text = ''
+            
+            while True:
+                try:
+                    post_data = {'Authorization':'bearer '+token}
+                    post_data = urllib.urlencode(post_data)
+                    conn = urllib2.urlopen(url = 'http://api.microsofttranslator.com/V2/Http.svc/Translate?text=' + text +'&from=en&to=zh-CHS', data = post_data)
+                    print conn.read()
+                    break
+                except:
+                    post_data = {'grant_type':'client_credentials', 'client_id':'autosub','client_secret':'AIZj1/ONTvxxF2mv1IlvP6Bhsi/jpGOsQu/yVnWq1rI=', 'scope':'http://api.microsofttranslator.com'}
+                    post_data = urllib.urlencode(post_data)
+                    conn = urllib2.urlopen(url = 'https://datamarket.accesscontrol.windows.net/v2/OAuth2-13?', data = post_data)
+                    obj = json.loads(conn.read())
+                    token = obj['access_token']
+            
+                                    
     
             seg = (int(seg[0]*100), int(seg[1]*100))
             count = count + 1
-            fout.write("%d\n%02d:%02d:%02d,%03d --> %02d:%02d:%02d,%03d\n%s\n\n" % (count, seg[0]/360000, (seg[0]%360000)/6000, (seg[0]%6000)/100, (seg[0]%100)*10, seg[1]/360000, (seg[1]%360000)/6000, (seg[1]%6000)/100, (seg[1]%100)*10, trans))
+            fout.write("%d\n%02d:%02d:%02d,%03d --> %02d:%02d:%02d,%03d\n%s\n\n" % (count, seg[0]/360000, (seg[0]%360000)/6000, (seg[0]%6000)/100, (seg[0]%100)*10, seg[1]/360000, (seg[1]%360000)/6000, (seg[1]%6000)/100, (seg[1]%100)*10, text))
             fout.flush()            
-            print count, trans
+            print count, text
         
         fout.close()
             

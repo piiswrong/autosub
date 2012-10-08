@@ -1,7 +1,6 @@
 from common.processor_np import *
 from common.data_stream import *
 import numpy as np
-from scipy.cluster.vq import kmeans
 
 
 
