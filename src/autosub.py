@@ -45,7 +45,7 @@ if __name__ == '__main__':
         print ' Chinese     zh-cn'
         print ' English     en'
         print ' Japanese    ja'
-        exit()
+        sys.exit()
     dec = fd.ffmpeg_decoder(source)
     vad = naive_vad(dec.ostream.get_handle())
     sub = sg.sub_generator(vad.ostream.get_handle(), source, target, lang_from = lang_from, lang_to = lang_to)
