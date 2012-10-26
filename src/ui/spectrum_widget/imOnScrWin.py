@@ -5,6 +5,7 @@ import core.ffmpeg_decoder as fd
 import core.spectrum as sp
 import matplotlib.pyplot as plt
 import numpy as np
+import wx.lib.agw.rulerctrl as RC
 
 import matplotlib.cm as cm
 import wx
@@ -47,7 +48,6 @@ while handle.more_data():
                 list.append(vector)
         Num = Num + 1
         
-im = wx.ImageFromBuffer(int(np.size(specW, axis = 1)), int(np.size(specW, axis = 0)), np.uint8(specW))
 
 
 
@@ -57,8 +57,11 @@ class ImageWindow(wx.ScrolledWindow):
     def __init__(self, parent):
         wx.ScrolledWindow.__init__(self, parent)
         self.SetScrollRate(5,5)
+        self.ClickFlag=0
         #self.Bind(wx.EVT_SCROLLWIN_THUMBTRACK, self.OnScroll)
         self.Bind(wx.EVT_PAINT, self.OnPaint)
+        self.Bind(wx.EVT_LEFT_DOWN, self.OnMouseClick)
+        self.overlay=wx.Overlay()
 
     def SetBitmap(self, bitmap):
         self.bitmap = bitmap
@@ -67,7 +70,6 @@ class ImageWindow(wx.ScrolledWindow):
         # The following does nothing when called before
         # the app starts.
         cdc = wx.ClientDC(self)
-        #self.DrawAxis(cdc)
         cdc.DrawBitmap(self.bitmap, 0, 150- self.bitmap.GetHeight())
         
         
@@ -78,10 +80,18 @@ class ImageWindow(wx.ScrolledWindow):
             dc = wx.BufferedPaintDC(self, self.bitmap.GetSubBitmap(rect), wx.BUFFER_VIRTUAL_AREA)
         else:
             dc = wx.BufferedPaintDC(self, self.bitmap, wx.BUFFER_VIRTUAL_AREA)
-
+        odc=wx.DCOverlay(self.overlay, dc)
+        odc.Clear()
+        if self.ClickFlag==1:
+                dc.SetPen(wx.Pen('red', 1))
+                dc.DrawLine(self.ReX-self.CalcScrolledPosition(0,0)[0],0,
+                            self.ReX-self.CalcScrolledPosition(0,0)[0], 150)
+        del odc
+        print -self.CalcScrolledPosition(0,0)[0]
+        event.Skip()
+        #self.DrawAxis(dc)
         #dc1 = wx.ClientDC(self)
         #self.DrawAxis(dc1)
-        #dc.SetPen(wx.Pen('red', 3))
         #dc.DrawLine(self.bitmap.GetWidth()/2.0, 0, self.bitmap.GetWidth()/2.0, 150)
 
         ## I have tried it with and without the following two lines
@@ -103,16 +113,32 @@ class ImageWindow(wx.ScrolledWindow):
         font = dc.GetFont()
         font.SetPointSize(8)
         dc.SetFont(font)
-        dc.DrawLine(1,130,np.size(specW, axis = 1), 130)
+        dc.DrawLine(1,110,np.size(specW, axis = 1), 110)
 
         for i in range(0, 70000, 20):
              dc.DrawText(str(i), i+5 , 140)
              dc.DrawLine(i, 110, i, 140)
+
+    def OnMouseClick(self, event):
+        #print event.GetLogicalPosition(self.cdc)
+        self.ClickFlag = 1
+        self.ReX=event.X
+        self.ClickFlag=1
+        self.Refresh()
+        dc=wx.ClientDC(self)
+        #self.CaptureMouse()
+        """odc=wx.DCOverlay(self.overlay, dc)
+        odc.Clear()
+        dc.SetPen(wx.Pen('red', 1))
+        dc.DrawLine(self.ReX-self.CalcScrolledPosition(0,0)[0],0,
+                            self.ReX-self.CalcScrolledPosition(0,0)[0], 150)"""
+        #del odc
+        event.Skip()
             
 class Panel1(wx.Frame):
     def __init__(self):
 
-        wx.Frame.__init__(self, None, -1)
+        wx.Frame.__init__(self, None, -1, ' spectrum widget')
         self.orim = wx.ImageFromBuffer(int(np.size(specW , axis = 1)), int(np.size(specW, axis = 0)), np.uint8(specW))
         #self.orim = Image.fromarray(specW)
         self.im = self.orim
@@ -125,7 +151,7 @@ class Panel1(wx.Frame):
                         size=(55, 150), style=wx.SL_VERTICAL | wx.SL_AUTOTICKS | wx.SL_LABELS)
         self.sld.SetTickFreq(20, 1)
         self.sld1 = wx.Slider(panel, value = 200, minValue = 150, maxValue =500,pos = (70,10),
-                        size=(150, 150), style=wx.SL_VERTICAL| wx.SL_AUTOTICKS | wx.SL_LABELS )
+                        size=(80, 150), style=wx.SL_VERTICAL| wx.SL_AUTOTICKS | wx.SL_LABELS )
         self.sld1.SetTickFreq(20, 1)
         
         
@@ -135,14 +161,24 @@ class Panel1(wx.Frame):
         wx.EVT_SLIDER(self.sld, self.sld.GetId(),self.sliderUpdate1)
         wx.EVT_SLIDER(self.sld1, self.sld1.GetId(),self.sliderUpdate2)
         self.wind.FitInside()
-        self.wind.SetScrollbars(1,0, 1000*len(list), 400)
+        self.wind.SetScrollbars(1,0, np.size(specW , axis = 1), 400)
+        print np.size(specW , axis = 1)
+
+        self.ruler=RC.RulerCtrl(self.wind, -1, pos=(0, np.size(specW, axis=0)), size=(np.size(specW , axis = 1),1),orient=wx.HORIZONTAL, style=wx.NO_BORDER)
+        self.ruler.SetFlip(flip=True)
+        self.ruler.SetRange(0, np.size(specW, axis = 1))
+        self.ruler.SetSpacing(spacing = 50)
+        self.ruler.LabelMajor(False)
+        self.ruler.SetBounds(0,0,70000,12)
+        self.ruler.AddIndicator(1, 50)
         
         sizer = wx.BoxSizer ()
-        sizer.Add(self.wind, 1, wx.EXPAND)
-        sizer.Add(panel)
+        sizer.Add(self.wind, 1, wx.EXPAND, 0)
+        sizer.Add(panel, wx.ALIGN_LEFT)
+        #sizer.Add(self.ruler)
         self.SetSizer(sizer)
-        self.Fit()
-        self.Layout()
+        self.SetSize((500,200))
+        #self.Fit()
         
     def sliderUpdate1(self, event):
         self.pos = self.sld.GetValue()
@@ -166,7 +202,7 @@ class Panel1(wx.Frame):
         self.im = self.orim.Rescale(NWID,NHET)
         self.wind.SetBitmap(self.im.ConvertToBitmap())
 
-
+        
 
 if __name__=='__main__':
     app = wx.PySimpleApp()
