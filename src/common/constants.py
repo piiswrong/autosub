@@ -7,3 +7,4 @@ FFMPEG_PATH = 'ffmpeg'
 CURL_PATH = 'curl'
 TMP_PATH = '../data/tmp'
 MAX_INT = 2147483647
+VLC_PATH = '..\\bin\\VLC'
