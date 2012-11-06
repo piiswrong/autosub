@@ -1,4 +1,4 @@
-# coding=utf8
+#coding = utf-8 
 import re
 import chardet
 import codecs
@@ -6,10 +6,10 @@ import codecs
 # 	myf=open(url,'r');
 
 def GetTheEncoding(content):
-	myf=open(url,'r');
-	# print myf.read();
-	cont=myf.read();
-	char=chardet.detect(cont)
+	# myf=open(url,'r');
+	# # print myf.read();
+	# cont=myf.read();
+	char=chardet.detect(content)
 	return char['encoding'];
 def AssParser(url):
 	myf=open(url,'r');
@@ -50,10 +50,11 @@ def SrtParser(url):
 		tmp=tmp.split(' ');
 		# print tmp;
 		nsub.append(allitem[i*4]);
-		nsub.append(tmp[0].replace(',','.'))
-		nsub.append(tmp[2].replace(',','.'));
-		nsub.append(allitem[i*4+2])
-		print nsub
+		nsub.append(tmp[0].replace(',','.'));
+		if(len(tmp)>2):
+			nsub.append(tmp[2].replace(',','.'));
+			nsub.append(allitem[i*4+2])
+		# print nsub
 		li.append(nsub);
 	return li;
 	# print allitem
@@ -63,11 +64,7 @@ def ShowItems(li):
 		print str(i.number)+' '+i.starttime+' '+i.endtime+' '+i.content;
 
 
-url1="D:\\ASE Python\\Products\\31.srt";
-url="D:\\ASE Python\\Products\\e1.ass";
-print url1;
-ass=AssParser(url)
-srt=SrtParser(url1)
+
 # ShowItems(srt);
 	
 

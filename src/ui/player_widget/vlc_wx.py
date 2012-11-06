@@ -29,9 +29,9 @@ Date: 23-11-2010
 # import external libraries
 import wx # 2.8
 import sys
-from wxTest import *
-from common import constants
-sys.path.append(constants.VLC_PATH)
+sys.path.append('myvlc')
+sys.path.append(' ../subtitle_widget/')
+from SubtitleEditor import *
 import vlc
 
 # import standard libraries
@@ -244,7 +244,7 @@ class Player(wx.Frame):
                                                                 wx.ICON_ERROR)
         edialog.ShowModal()
 
-def ui_main():
+if __name__ == "__main__":
     # Create a wx.App(), which handles the windowing system event loop
     app = wx.PySimpleApp()
     # Create the window containing our small media player
@@ -254,6 +254,3 @@ def ui_main():
     player.Show()
     player.player.set_hwnd(player.videopanel.GetHandle())
     app.MainLoop()
-    
-if __name__ == "__main__":
-    ui_main()
