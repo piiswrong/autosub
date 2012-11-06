@@ -97,13 +97,13 @@ class MyFrame(wx.Frame):
 
         # The second panel holds controls
         ctrlpanel = wx.Panel(self, -1 )
-        self.timeslider = wx.Slider(ctrlpanel, -1, 0, 0, 1000) #timeline
+        self.timeslider = wx.Slider(ctrlpanel, -1, 0, 0, 1000,size=(500,20)) #timeline
         self.timeslider.SetRange(0, 1000)
-        self.bufferslider = wx.Slider(ctrlpanel, -1, 0, 0, 1000) 
-        self.bufferslider.SetRange(0, 1000)
+        self.buffergauge = wx.Gauge(ctrlpanel, -1,1000,size=(500,10)) 
+        self.buffergauge.SetRange(1000)
                                       
-        self.displaytime=wx.StaticText(ctrlpanel, -1, "00:00/00:00", size=(10,20))
-        self.buffertime=wx.StaticText(ctrlpanel, -1, "00:00/00:00", size=(10,20))
+        self.displaytime=wx.StaticText(ctrlpanel, -1, "00:00/00:00", size=(10,15))
+        self.buffertime=wx.StaticText(ctrlpanel, -1, "00:00/00:00", size=(10,15))
         
         pause  = wx.Button(ctrlpanel, label="Pause")
         play   = wx.Button(ctrlpanel, label="Play")
@@ -121,7 +121,7 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_SLIDER, self.OnSetVolume, self.volslider)
         self.Bind(wx.EVT_SLIDER, self.OnSetPlayTime, self.timeslider)
         self.Bind(wx.EVT_BUTTON, self.OnToggleFullScreen, fullscreen)
-        self.Bind(wx.EVT_SLIDER, self.OnSetBuffer, self.bufferslider)
+
 
         # Give a pretty layout to the controls
         ctrlbox = wx.BoxSizer(wx.VERTICAL)
@@ -134,7 +134,7 @@ class MyFrame(wx.Frame):
      
         box1.Add(self.timeslider,1)
         # box2 contains the bufferslider
-        box2.Add(self.bufferslider,1)
+        box2.Add(self.buffergauge,1)
         # box3 contains some buttons and the volume controls
         box3.Add(play, flag=wx.RIGHT, border=5)
         box3.Add(pause)
@@ -155,7 +155,7 @@ class MyFrame(wx.Frame):
         
         ctrlbox.Add(box1, flag=wx.EXPAND | wx.BOTTOM, border=0)
         ctrlbox.Add(box5, flag=wx.EXPAND | wx.BOTTOM, border=0)
-        ctrlbox.Add(box2, flag=wx.EXPAND | wx.BOTTOM, border=0)
+        ctrlbox.Add(box2, flag=wx.EXPAND | wx.BOTTOM, border=5)
 
         
         ctrlbox.Add(box3, 1, wx.EXPAND)
@@ -265,6 +265,7 @@ class MyFrame(wx.Frame):
         # re-set the timeslider to the correct range.
         length = self.player.get_length()
         self.timeslider.SetRange(-1, length)
+        self.buffergauge.SetRange(length)
 
         # update the time on the slider
         time = self.player.get_time()
@@ -276,7 +277,7 @@ class MyFrame(wx.Frame):
         # update the buffertime
         
         # update the bufferslder
-
+        self.OnSetBuffer(None)
         # update the subtitle
         
 
@@ -310,7 +311,7 @@ class MyFrame(wx.Frame):
         
 
     def OnSetBuffer(self, evt):
-        setbuffer=self.bufferslider.GetValue()
+        self.buffergauge.SetValue(self.timeslider.GetValue())
         pass
 
 
