@@ -213,7 +213,7 @@ class MyFrame(wx.Frame):
             #  filename
             if title == -1:
                 title = filename
-            self.SetTitle("%s - wxVLCplayer" % title)
+            self.SetTitle("%s - AutoSub" % title)
 
             # set the window id where to render VLC's video output
             self.player.set_hwnd(self.videopanel.GetHandle())
@@ -266,13 +266,37 @@ class MyFrame(wx.Frame):
         length = self.player.get_length()
         self.timeslider.SetRange(-1, length)
         self.buffergauge.SetRange(length)
+        
+        length_second=length/1000
+        self.length_min=length_second/60
+        self.length_sec=length_second-self.length_min*60
 
         # update the time on the slider
         time = self.player.get_time()
         self.timeslider.SetValue(time)
 
         # update the displaytime 
-        self.displaytime.SetLabel(str(time))
+        second=time/1000
+        self.current_min=second/60
+        self.current_second=second-self.current_min*60
+        if self.current_min<10:
+            str_min="0"+str(self.current_min)
+        else:
+            str_min=str(self.current_min)
+        if self.current_second<10:
+            str_sec="0"+str(self.current_second)
+        else:
+            str_sec=str(self.current_second)
+            
+        if self.length_min<10:
+            str_length_min="0"+str(self.length_min)
+        else:
+            str_length_min=str(self.length_min)
+        if self.length_sec<10:
+            str_length_sec="0"+str(self.length_sec)
+        else:
+            str_length_sec=str(self.length_sec)
+        self.displaytime.SetLabel(str_min+":"+str_sec+"/"+str_length_min+":"+str_length_sec)
 
         # update the buffertime
         
