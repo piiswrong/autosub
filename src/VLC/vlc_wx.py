@@ -1,7 +1,7 @@
 # import external libraries
 import wx # 2.8
 import sys
-#sys.path.append('C:\Program Files (x86)\VideoLAN\VLC')
+sys.path.append('myvlc')
 import vlc
 
 # import standard libraries
@@ -19,6 +19,8 @@ class MyFrame(wx.Frame):
         #Menu Bar
         self.frame_menubar=wx.MenuBar()
         #  File Menu
+        self.icon=wx.Icon('autosub.ico',wx.wx.BITMAP_TYPE_ICO);
+        self.SetIcon(self.icon);
         self.file_menu=wx.Menu()
         self.file_menu.Append(1,"&Open \tCtrl+O")
         self.file_menu.AppendSeparator()
