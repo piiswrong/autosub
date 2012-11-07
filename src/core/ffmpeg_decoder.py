@@ -6,14 +6,15 @@ from common import constants
 
 class ffmpeg_decoder(processor):
     
-    def __init__(self, file_name):
+    def __init__(self, file_name, output_rate = constants.AUDIO_SAMPLE_RATE):
         super(ffmpeg_decoder, self).__init__()
         self.file_name = file_name
-        self.ostream = data_stream(constants.AUDIO_SAMPLE_RATE, data_format = {'dtype':np.int16})
+        self.ostream = data_stream(output_rate, data_format = {'dtype':np.int16})
         self.odtype = np.int16
+        self.output_rate = output_rate
         
     def run(self):
-        ffmpeg = subprocess.Popen([constants.FFMPEG_PATH, '-v', '0', '-i', self.file_name, '-vn', '-ar', str(constants.AUDIO_SAMPLE_RATE), '-ac', '1', '-f', 's16le', '-'], stdout = subprocess.PIPE)
+        ffmpeg = subprocess.Popen([constants.FFMPEG_PATH, '-v', '0', '-i', self.file_name, '-vn', '-ar', str(self.output_rate), '-ac', '1', '-f', 's16le', '-'], stdout = subprocess.PIPE)
         while True:
             s = ffmpeg.stdout.read(512)
             if not s:
