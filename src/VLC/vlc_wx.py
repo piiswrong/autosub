@@ -2,18 +2,20 @@
 import wx # 2.8
 import sys
 sys.path.append('myvlc')
+sys.path.append('subtitle_widget')
 import vlc
 
 # import standard libraries
 import os
 import user
+from SubtitleEditor import * 
 
 class MyFrame(wx.Frame):
     """The main window
     """
 
     def __init__(self,title):
-        wx.Frame.__init__(self, None, -1, title)
+        frame=wx.Frame.__init__(self, None, -1, title)
         
         
         #Menu Bar
@@ -91,6 +93,8 @@ class MyFrame(wx.Frame):
  
 
         #Panels
+        # This is the subtitlepanel
+        self.subtitlepanel=wx.Panel(self, -1);
         # The first panel of the video
         self.videopanel = wx.Panel(self, -1)
         self.videopanel.SetBackgroundColour(wx.BLACK)
@@ -112,6 +116,10 @@ class MyFrame(wx.Frame):
         fullscreen = wx.Button(ctrlpanel, label="FullScreen")
         
         self.volslider = wx.Slider(ctrlpanel, -1, 0, 0, 100, size=(100, -1))
+        
+        ''' this is the Subtitle Editor'''
+        # pos=wx.Frame.GetPosition();
+
         
         """Bind Control to Events"""
         self.Bind(wx.EVT_BUTTON, self.OnPlay, play)
@@ -162,9 +170,13 @@ class MyFrame(wx.Frame):
         ctrlpanel.SetSizer(ctrlbox)
         # Put everything togheter
         sizer = wx.BoxSizer(wx.VERTICAL)
+
+        BigSizer = wx.BoxSizer(wx.HORIZONTAL)
         sizer.Add(self.videopanel, 1, flag=wx.EXPAND)
         sizer.Add(ctrlpanel, flag=wx.EXPAND | wx.BOTTOM | wx.TOP, border=10)
-        self.SetSizer(sizer)
+
+        BigSizer.Add(sizer,flag=wx.EXPAND)
+        self.SetSizer(BigSizer)
         self.SetMinSize((500, 400))
 
         # finally create the timer, which updates the timeslider
@@ -337,6 +349,7 @@ if __name__ == "__main__":
     app = wx.PySimpleApp()
     # Create the window containing our small media player
     PlayerFrame = MyFrame("AutoSub")
+    Subtitle(PlayerFrame, title='Subtitle',positon=(1100,300))
     PlayerFrame.SetPosition((0,0))
     
     # show the player window centred and run the application
