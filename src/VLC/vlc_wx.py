@@ -376,7 +376,7 @@ if __name__ == "__main__":
     app = wx.PySimpleApp()
     # Create the window containing our small media player
     PlayerFrame = MyFrame("AutoSub")
-    Subtitle(PlayerFrame, title='Subtitle',positon=(1100,300))
+    # Subtitle(PlayerFrame, title='Subtitle',positon=(1100,300))
     PlayerFrame.SetPosition((0,0))
     
     # show the player window centred and run the application
