@@ -1,5 +1,6 @@
 # import external libraries
 import wx # 2.8
+import wx.lib.platebtn as pbtn
 import sys
 sys.path.append('myvlc')
 import vlc
@@ -105,11 +106,13 @@ class MyFrame(wx.Frame):
         self.displaytime=wx.StaticText(ctrlpanel, -1, "00:00/00:00", size=(10,15))
         self.buffertime=wx.StaticText(ctrlpanel, -1, "00:00/00:00", size=(10,15))
         
-        pause  = wx.Button(ctrlpanel, label="Pause")
-        play   = wx.Button(ctrlpanel, label="Play")
-        stop   = wx.Button(ctrlpanel, label="Stop")
-        volume = wx.Button(ctrlpanel, label="Volume")        
-        fullscreen = wx.Button(ctrlpanel, label="FullScreen")
+        pause  = pbtn.PlateButton(ctrlpanel, label="Pause")
+
+
+        play   = pbtn.PlateButton(ctrlpanel, label="Play")
+        stop   = pbtn.PlateButton(ctrlpanel, label="Stop")
+        volume = pbtn.PlateButton(ctrlpanel, label="Volume")        
+        fullscreen = pbtn.PlateButton(ctrlpanel, label="FullScreen")
         
         self.volslider = wx.Slider(ctrlpanel, -1, 0, 0, 100, size=(100, -1))
         
@@ -137,11 +140,11 @@ class MyFrame(wx.Frame):
         box2.Add(self.buffergauge,1)
         # box3 contains some buttons and the volume controls
         box3.Add(play, flag=wx.RIGHT, border=5)
-        box3.Add(pause)
-        box3.Add(stop)
+        box3.Add(pause,flag=wx.RIGHT,border=5)
+        box3.Add(stop,flag=wx.RIGHT,border=5)
         box3.Add((-1, -1), 1)
-        box3.Add(fullscreen)
-        box3.Add(volume)
+        box3.Add(fullscreen,flag=wx.RIGHT,border=5)
+        box3.Add(volume,flag=wx.RIGHT,border=5)
         box3.Add(self.volslider, flag=wx.TOP | wx.LEFT, border=5)
 
         # box4 contains the playtime
