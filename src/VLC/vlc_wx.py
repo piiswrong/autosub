@@ -3,13 +3,13 @@ import wx # 2.8
 import wx.lib.platebtn as pbtn
 import sys
 sys.path.append('myvlc')
-sys.path.append('subtitle_widget')
+# sys.path.append('subtitle_widget')
 import vlc
 
 # import standard libraries
 import os
 import user
-from SubtitleEditor import * 
+# from SubtitleEditor import * 
 
 class MyFrame(wx.Frame):
     """The main window
