@@ -5,10 +5,9 @@ import core.ffmpeg_decoder as fd
 import core.spectrum as sp
 import matplotlib.pyplot as plt
 import numpy as np
-import wx.lib.agw.rulerctrl as RC
+import RulerCtrl as RC
 
 import matplotlib.cm as cm
-import wx
 
 dec = fd.ffmpeg_decoder('../data/demo.mp4')
 spec = sp.spectrum(dec.ostream.get_handle())
@@ -57,36 +56,62 @@ class ImageWindow(wx.ScrolledWindow):
     def __init__(self, parent):
         wx.ScrolledWindow.__init__(self, parent)
         self.SetScrollRate(5,5)
-        self.ClickFlag=0
-        #self.Bind(wx.EVT_SCROLLWIN_THUMBTRACK, self.OnScroll)
+        self.LeftClickFlag=0
+        self.RightClickFlag=0
+        self.ScrollFlag=1
+        #self.Bind(wx.EVT_SCROLLWIN_THUMBTRACK, self.OnScroll
         self.Bind(wx.EVT_PAINT, self.OnPaint)
         self.Bind(wx.EVT_LEFT_DOWN, self.OnMouseClick)
+        self.Bind(wx.EVT_RIGHT_DOWN, self.OnRightClick)
         self.overlay=wx.Overlay()
+        #ruler=RC.RulerCtrl(self, -1, pos=(0, np.size(specW, axis=0)), size=(np.size(specW , axis = 1),1),orient=wx.HORIZONTAL, style=wx.NO_BORDER)
+        #ruler.SetFlip(flip=True)
+        #ruler.SetRange(0, np.size(specW , axis = 1))
 
     def SetBitmap(self, bitmap):
         self.bitmap = bitmap
+        self.buffer = wx.EmptyBitmap(bitmap.GetWidth(), bitmap.GetHeight()+15)
         #self.SetVirtualSize(bitmap.GetSize())
  
         # The following does nothing when called before
         # the app starts.
-        cdc = wx.ClientDC(self)
-        cdc.DrawBitmap(self.bitmap, 0, 150- self.bitmap.GetHeight())
+        #cdc = wx.ClientDC(self)
+        #cdc.DrawBitmap(self.bitmap, 0, 150- self.bitmap.GetHeight())
         
         
     def OnPaint(self, event):
         #dc = wx.BufferedPaintDC(self, self.bitmap)
-        if self.bitmap.GetHeight() > 150:
+        """if self.bitmap.GetHeight() > 150:
             rect = wx.Rect(0, self.bitmap.GetHeight() - 150, self.bitmap.GetWidth(), 150)
             dc = wx.BufferedPaintDC(self, self.bitmap.GetSubBitmap(rect), wx.BUFFER_VIRTUAL_AREA)
         else:
-            dc = wx.BufferedPaintDC(self, self.bitmap, wx.BUFFER_VIRTUAL_AREA)
+            dc = wx.BufferedPaintDC(self, self.bitmap, wx.BUFFER_VIRTUAL_AREA)"""
+        dc = wx.BufferedPaintDC(self, self.buffer, wx.BUFFER_VIRTUAL_AREA)
+        dc.DrawBitmap(self.bitmap, 0, 0)
         odc=wx.DCOverlay(self.overlay, dc)
         odc.Clear()
-        if self.ClickFlag==1:
+        if self.LeftClickFlag==1:
                 dc.SetPen(wx.Pen('red', 1))
-                dc.DrawLine(self.ReX-self.CalcScrolledPosition(0,0)[0],0,
-                            self.ReX-self.CalcScrolledPosition(0,0)[0], 150)
+                dc.DrawLine(self.LeX,0,
+                            self.LeX, 150)
+        if self.RightClickFlag==1:
+                dc.SetPen(wx.Pen('blue',1))
+                dc.DrawLine(self.RiX,0,
+                            self.RiX, 150)
+        #Draw a transparent rectangle to emphasize the selected area
+        #if self.LeftClickFlag == 1&& self.RightClickFlag == 1 && self.LeX!=self.RiX:
+                
+        self.LeftClickFlag=0
+        self.RightClickFlag=0
+        Color = wx.Colour(139,0,255,100)
         del odc
+        dc.SetPen(wx.Pen('white',1))
+        dc.SetTextForeground('white')
+        for i in range(-self.CalcScrolledPosition(0,0)[0], self.bitmap.GetWidth(), 10):
+                dc.DrawLine(i, self.bitmap.GetHeight(), i, self.bitmap.GetHeight()+5)
+                font = wx.Font(7, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_LIGHT)
+                dc.SetFont(font)
+                dc.DrawText(str(i), i, self.bitmap.GetHeight()+5)
         print -self.CalcScrolledPosition(0,0)[0]
         event.Skip()
         #self.DrawAxis(dc)
@@ -99,33 +124,21 @@ class ImageWindow(wx.ScrolledWindow):
         #dc.DrawBitmap(self.bitmap, x, y)
             
     def OnScroll(self, evt):
-        a = self.GetScrollPos(wx.HORIZONTAL)/1010
+        self.ScrollFlag = 1
+        """a = self.GetScrollPos(wx.HORIZONTAL)/1010
         #print a
         self.image = wx.ImageFromBuffer(int(np.size(vector, axis = 1)), int(np.size(vector, axis = 0)), np.uint8(vector))
         self.bitmap = self.image.ConvertToBitmap()
         cdc = wx.ClientDC(self)
         cdc.DrawBitmap(self.bitmap, 1000 * a, 150-self.bitmap.GetHeight())
-        #self.image = wx.ImageFromBuffer(int(np.size(list[], axis = 1)), int(np.size(list[0], axis = 0)), np.uint8(list[0]))
+        #self.image = wx.ImageFromBuffer(int(np.size(list[], axis = 1)), int(np.size(list[0], axis = 0)), np.uint8(list[0]))"""
         evt.Skip()
-
-    def DrawAxis(self, dc):
-        dc.SetPen(wx.Pen('#0AB1FF'))
-        font = dc.GetFont()
-        font.SetPointSize(8)
-        dc.SetFont(font)
-        dc.DrawLine(1,110,np.size(specW, axis = 1), 110)
-
-        for i in range(0, 70000, 20):
-             dc.DrawText(str(i), i+5 , 140)
-             dc.DrawLine(i, 110, i, 140)
 
     def OnMouseClick(self, event):
         #print event.GetLogicalPosition(self.cdc)
-        self.ClickFlag = 1
-        self.ReX=event.X
-        self.ClickFlag=1
+        self.LeftClickFlag = 1
+        self.LeX=event.X -self.CalcScrolledPosition(0,0)[0]
         self.Refresh()
-        dc=wx.ClientDC(self)
         #self.CaptureMouse()
         """odc=wx.DCOverlay(self.overlay, dc)
         odc.Clear()
@@ -133,6 +146,12 @@ class ImageWindow(wx.ScrolledWindow):
         dc.DrawLine(self.ReX-self.CalcScrolledPosition(0,0)[0],0,
                             self.ReX-self.CalcScrolledPosition(0,0)[0], 150)"""
         #del odc
+        event.Skip()
+
+    def OnRightClick(self, event):
+        self.RightClickFlag = 1
+        self.RiX=event.X - self.CalcScrolledPosition(0,0)[0]
+        self.Refresh()
         event.Skip()
             
 class Panel1(wx.Frame):
@@ -161,16 +180,14 @@ class Panel1(wx.Frame):
         wx.EVT_SLIDER(self.sld, self.sld.GetId(),self.sliderUpdate1)
         wx.EVT_SLIDER(self.sld1, self.sld1.GetId(),self.sliderUpdate2)
         self.wind.FitInside()
-        self.wind.SetScrollbars(1,0, np.size(specW , axis = 1), 400)
-        print np.size(specW , axis = 1)
-
-        self.ruler=RC.RulerCtrl(self.wind, -1, pos=(0, np.size(specW, axis=0)), size=(np.size(specW , axis = 1),1),orient=wx.HORIZONTAL, style=wx.NO_BORDER)
+        self.wind.SetScrollbars(1,0, self.im.GetWidth(), 400)
+        
+        
+        """self.ruler=RC.RulerCtrl(panel, -1, pos=(0, np.size(specW, axis=0)), size=(30000,1),orient=wx.HORIZONTAL, style=wx.NO_BORDER)
         self.ruler.SetFlip(flip=True)
-        self.ruler.SetRange(0, np.size(specW, axis = 1))
-        self.ruler.SetSpacing(spacing = 50)
-        self.ruler.LabelMajor(False)
-        self.ruler.SetBounds(0,0,70000,12)
-        self.ruler.AddIndicator(1, 50)
+        self.ruler.SetRange(0, self.im.GetWidth())
+        #self.ruler.SetFormat(RC.TimeFormat)
+        self.ruler.AddIndicator(1, 50)"""
         
         sizer = wx.BoxSizer ()
         sizer.Add(self.wind, 1, wx.EXPAND, 0)
@@ -191,18 +208,7 @@ class Panel1(wx.Frame):
         self.wind.SetBitmap(self.im.ConvertToBitmap())
 
     def sliderUpdate2(self, event):
-        self.pos = self.sld1.GetValue()
-        #str = "pos = %f" % (self.pos/150.0)
-        self.Refresh()
-        self.orim = wx.ImageFromBuffer(int(np.size(specW , axis = 1)), int(np.size(specW, axis = 0)), np.uint8(specW))
-        #self.orim = Image.fromarray(specW)
-        
-        NWID = round(self.im.GetWidth())
-        NHET = round(self.bm.GetHeight()*self.pos/200.0)
-        self.im = self.orim.Rescale(NWID,NHET)
-        self.wind.SetBitmap(self.im.ConvertToBitmap())
-
-        
+        pass        
 
 if __name__=='__main__':
     app = wx.PySimpleApp()
