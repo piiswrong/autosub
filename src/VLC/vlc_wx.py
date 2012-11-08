@@ -248,7 +248,14 @@ class MyFrame(wx.Frame):
         r_dlgcode=r_dlg.ShowModal()
         if(r_dlgcode==wx.ID_YES):
             # enable recognization
-            pass
+            origin_lan=["English","Japanese"]
+            origin_lan_diag=wx.SingleChoiceDialog(None,"Choose the origin language","Origin Language Choice",origin_lan)
+            if origin_lan_diag.ShowModal()==wx.ID_OK:
+                print"The origin language is:%s\n"%origin_lan_diag.GetStringSelection()
+                #enable the back program
+                pass
+            origin_lan_diag.Destroy()
+            
         else:
             # disable recognization
             pass
@@ -259,6 +266,13 @@ class MyFrame(wx.Frame):
         t_dlgcode=t_dlg.ShowModal()
         if(t_dlgcode==wx.ID_YES):
             # enable translation
+            translate_lan=["English","Japanese","Chinese"]
+            translate_lan_diag=wx.SingleChoiceDialog(None,"Choose the translate language","Translate Language Choice",translate_lan)
+            if translate_lan_diag.ShowModal()==wx.ID_OK:
+                print"The translate language is:%s\n"%translate_lan_diag.GetStringSelection()
+                #enable the back program
+                pass
+            translate_lan_diag.Destroy()
             pass
         else:
             # disable translation
