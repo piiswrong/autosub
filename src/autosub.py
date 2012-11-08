@@ -52,6 +52,7 @@ if __name__ == '__main__':
     dec = fd.ffmpeg_decoder(source)
     vad = naive_vad(dec.ostream.get_handle())
     sub = sg.sub_generator(vad.ostream.get_handle(), source, target, lang_from = lang_from, lang_to = lang_to)
+    ohandle = sub.ostream.get_handle()
     dec.start()
     vad.start()
     sub.start()

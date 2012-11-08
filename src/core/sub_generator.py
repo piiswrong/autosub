@@ -1,4 +1,5 @@
 from common.processor import processor
+from common.data_stream import data_stream
 import subprocess
 from common import constants
 import time
@@ -17,6 +18,7 @@ class sub_generator(processor):
         self.outfile = outfile
         self.lang_from = lang_from
         self.lang_to = lang_to
+        self.ostream = data_stream(0)
         
     def run(self):
         fout = open(self.outfile, 'w')
@@ -73,6 +75,8 @@ class sub_generator(processor):
                             token = obj['access_token']
                     print 'translation:', trans_text
                     sub_text = trans_text
+            
+            self.ostream.write([(seg[0], seg[1], sub_text)])            
             
             seg = (int(seg[0]*100), int(seg[1]*100))
             count = count + 1  

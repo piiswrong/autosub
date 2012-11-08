@@ -3,7 +3,8 @@ import sys
 from core.ffmpeg_decoder import ffmpeg_decoder
 from core.spectrum import spectrum
 from core.feature_extractor import feature_extractor
-
+import matplotlib.pyplot as plt
+import numpy as np
 
 SAMPLE_RATE = 8000
 N = 1
@@ -28,9 +29,21 @@ for sub_name, mov_name in zip(sub_names, mov_names):
     for line in fsub:
         if line.startswith('Dialogue:'):
             line = line.strip().split(',')
-            if line[3] == 'Default':
-                intervels.append( (parse_time(line[1]), parse_time(line[2])) )
+            
+            if line[3] != 'Default' or line[9].startswith('{\\an8'):
+                intervels.append( (parse_time(line[1]), parse_time(line[2]), False) )
+            else:
+                intervels.append( (parse_time(line[1]), parse_time(line[2]), True) )
+
     intervels.sort(cmp=lambda x,y: cmp(x[0], y[0]))
+    
+    i = 0
+    while i < len(intervels)-1:
+        if intervels[i][1] > intervels[i+1][0]:
+            intervels[i] = (intervels[i][0], intervels[i+1][1], intervels[i][2] and intervels[i+1][2])
+            del intervels[i+1]
+        else:
+            i = i + 1
     
     dec = ffmpeg_decoder(mov_name, SAMPLE_RATE)
     spec = spectrum(dec.ostream.get_handle(), squared = False)
@@ -40,4 +53,8 @@ for sub_name, mov_name in zip(sub_names, mov_names):
     feat.start()
     
     feat.join()
+    
+for f in speech:
+    plt.imshow(np.log(abs(f)**2).reshape((5, 128)))
+    plt.show()
     

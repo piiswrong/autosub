@@ -2,6 +2,7 @@ from common.processor_np import *
 from common.data_stream import *
 import numpy as np
 from common import constants
+import matplotlib.pyplot as plt
 
 
 class feature_extractor(processor_np):
@@ -21,6 +22,8 @@ class feature_extractor(processor_np):
         self.p_intervel = 0
         
     def work(self, buff, size, pos):
+#        plt.imshow(np.log(abs(buff)**2))
+#        plt.show()
         for i in xrange(self.feat_length/2, size - self.feat_length/2):
             if self.p_intervel == len(self.intervels):
                 self.noise.append(buff[i-2:i+3, :].reshape(-1))
@@ -33,7 +36,9 @@ class feature_extractor(processor_np):
                     if (pos + i + 1)/self.input_rate >= self.intervels[self.p_intervel][0]:
                         self.state = 2
                 elif self.state == 2:
-                    self.speech.append(buff[i-2:i+3, :].reshape(-1))
+                    if self.intervels[self.p_intervel][2]:
+                        self.speech.append(buff[i-2:i+3, :].reshape(-1))
+                        #print (pos + i)/self.input_rate
                     if (pos + i + 1)/self.input_rate >= self.intervels[self.p_intervel][1]:
                         self.state = 3
                 elif self.state == 3:
