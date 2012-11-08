@@ -232,9 +232,6 @@ class MyFrame(wx.Frame):
 
             # set the window id where to render VLC's video output
             self.player.set_hwnd(self.videopanel.GetHandle())
-            # FIXME: this should be made cross-platform
-            self.OnPlay(None)
-
             # set the volume slider to the current volume
             self.volslider.SetValue(self.player.audio_get_volume() / 2)
             
@@ -278,6 +275,9 @@ class MyFrame(wx.Frame):
             # disable translation
             pass
         t_dlg.Destroy()
+
+        # Finally Play~FIXME: this should be made cross-platform
+        self.OnPlay(None)
 
     def OnPlay(self, evt):
         """Toggle the status to Play/Pause.
