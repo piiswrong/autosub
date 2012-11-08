@@ -3,13 +3,13 @@ import wx # 2.8
 import wx.lib.platebtn as pbtn
 import sys
 sys.path.append('myvlc')
-# sys.path.append('subtitle_widget')
+sys.path.append('subtitle_widget')
 import vlc
 
 # import standard libraries
 import os
 import user
-# from SubtitleEditor import * 
+from SubtitleEditor import * 
 
 class MyFrame(wx.Frame):
     """The main window
@@ -174,13 +174,18 @@ class MyFrame(wx.Frame):
         # Put everything togheter
         sizer = wx.BoxSizer(wx.VERTICAL)
 
+
         BigSizer = wx.BoxSizer(wx.HORIZONTAL)
+
         sizer.Add(self.videopanel, 1, flag=wx.EXPAND)
         sizer.Add(ctrlpanel, flag=wx.EXPAND | wx.BOTTOM | wx.TOP, border=10)
 
+
         BigSizer.Add(sizer,flag=wx.EXPAND)
+        suntitle=Subtitle(self,title="Autosub")
+        BigSizer.Add(suntitle.mysizer(),flag=wx.EXPAND|wx.RIGHT);
         self.SetSizer(BigSizer)
-        self.SetMinSize((500, 400))
+        self.SetMinSize((800, 400))
 
         # finally create the timer, which updates the timeslider
         self.timer = wx.Timer(self)

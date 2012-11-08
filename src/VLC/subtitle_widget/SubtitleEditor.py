@@ -102,27 +102,87 @@
 
 import wx
 import os
-import codecs
+import wx.lib.platebtn as pbtn
 from subtitleparser import *
 from SubtitleUI import TestFrame
 class Subtitle(wx.Frame):
 	colLabels = ["homer", "marge", "bart", "lisa", "maggie"]
-	def __init__(self, parent, title,positon):
+	def __init__(self, parent, title):
 		super(Subtitle, self).__init__(parent, title=title, 
-			size=(380, 300),pos=positon)
+			size=(380, 300))
 			
-		pp=self.InitUI()
-		
-		self.Show()     
-		
+		self.sizer=self.InitUI()
+		self.Centre()
+		   
+	def mysizer(self):
+		return self.sizer
 	def InitUI(self):
 	
 		panel = wx.Panel(self, -1)
 
+		ctrlpanel=wx.Panel(self,-1)
+	
+		
+		ctrlbar=wx.BoxSizer(wx.HORIZONTAL); 
+		save  = pbtn.PlateButton(ctrlpanel, label="Save")
+		add   = pbtn.PlateButton(ctrlpanel, label="Add")
+
+
+		# ctrlbar = wx.BoxSizer(wx.VERTICAL)
+		ctrlbox = wx.BoxSizer(wx.VERTICAL)
+		# box1 = wx.BoxSizer(wx.HORIZONTAL)
+		# box2 = wx.BoxSizer(wx.HORIZONTAL)
+		box3 = wx.BoxSizer(wx.HORIZONTAL)
+		# box4 = wx.BoxSizer(wx.HORIZONTAL)
+		# box5 = wx.BoxSizer(wx.HORIZONTAL)
+		# box1 contains the timeslider
+	 
+		# box1.Add(self.timeslider,1)
+		# # box2 contains the bufferslider
+		# box2.Add(self.buffergauge,1)
+		# box3 contains some buttons and the volume controls
+		box3.Add(save, flag=wx.RIGHT, border=5)
+		box3.Add(add,flag=wx.RIGHT,border=5)
+		box3.Add((-1, -1), 1)
+		# box3.Add(stop,flag=wx.RIGHT,border=5)
+		# box3.Add((-1, -1), 1)
+		# box3.Add(fullscreen,flag=wx.RIGHT,border=5)
+		# box3.Add(volume,flag=wx.RIGHT,border=5)
+		# box3.Add(self.volslider, flag=wx.TOP | wx.LEFT, border=5)
+
+		# # box4 contains the playtime
+		# box4.Add(self.displaytime,1)
+		# # box5 contains the buffertime
+		# box5.Add(self.buffertime, 1)
+
+		
+		# Merge box to the ctrlsizer
+		# ctrlbox.Add(box4, flag=wx.EXPAND | wx.BOTTOM, border=0)
+		# ctrlbox.Add(box1, flag=wx.EXPAND | wx.BOTTOM, border=0)
+		# ctrlbox.Add(box5, flag=wx.EXPAND | wx.BOTTOM, border=0)
+		# ctrlbox.Add(box2, flag=wx.EXPAND | wx.BOTTOM, border=5)
+
+		
 		self.begintext=wx.StaticText(panel,-1,"Start time",(33,23));
 		self.endtext=wx.StaticText(panel,-1,"End time",(183,23));
-		
+		# ctrlbar.Add(save, flag=wx.RIGHT, border=5)
+		# ctrlbar.Add(add,flag=wx.RIGHT,border=5)
+		# # ctrlbar.Add(stop,flag=wx.LEFT,border=5)
+		# ctrlbox=wx.BoxSizer(wx.VERTICAL);
+		# ctrlbox.Add(ctrlbar,1,wx.EXPAND)
+		# ctrlpanel.SetSizer(ctrlbox)
 
+		# right=wx.BoxSizer(wx.VERTICAL)
+		# timerow=wx.BoxSizer(wx.HORIZONTAL)
+		# titlerow=wx.BoxSizer(wx.HORIZONTAL)
+		# subrow=wx.BoxSizer(wx.HORIZONTAL)
+
+		# right.Add(ctrlpanel,flag=wx.EXPAND | wx.BOTTOM | wx.TOP,border=10)
+		# right.Add(timerow,flag=wx.EXPAND);
+		# right.Add(titlerow,flag=wx.EXPAND);
+		# right.Add(subrow,flag=wx.EXPAND);
+		
+		# panel.SetSizer(right);
 		self.text=wx.StaticText(panel,-1,"Content",(170,40))
 		
 
@@ -155,6 +215,19 @@ class Subtitle(wx.Frame):
 		self.SetMenuBar(menubar)
 		statusbar=self.CreateStatusBar()
 
+		ctrlbox.Add(box3, 1, wx.EXPAND)
+		ctrlpanel.SetSizer(ctrlbox)
+		# Put everything togheter
+		sizer = wx.BoxSizer(wx.VERTICAL)
+
+		BigSizer = wx.BoxSizer(wx.HORIZONTAL)
+
+		# sizer.Add(self.videopanel, 1, flag=wx.EXPAND)
+		sizer.Add(ctrlpanel, flag=wx.EXPAND | wx.BOTTOM | wx.TOP, border=0)
+		sizer.Add(panel, flag=wx.EXPAND | wx.BOTTOM | wx.TOP, border=0)
+		BigSizer.Add(sizer,flag=wx.EXPAND)
+		self.SetSizer(BigSizer)
+		return BigSizer
 		# hbox.Add(frid, proportion=1, flag=wx.ALL|wx.EXPAND, border=15)
 	def ChooseOneItem(self,event):
 		index=self.listBox.GetSelection()
@@ -250,6 +323,6 @@ class Subtitle(wx.Frame):
 
 
 if __name__ == '__main__':
-	app = wx.App()
+	app = wx.App(redirect=False)
 	Subtitle(None, title='Subtitle')
 	app.MainLoop()
