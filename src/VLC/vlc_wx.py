@@ -242,6 +242,28 @@ class MyFrame(wx.Frame):
 
         # finally destroy the dialog
         dlg.Destroy()
+        
+        # create the recognization choice dialog
+        r_dlg=wx.MessageDialog(None,"Need recognization?",'Recognization Choice',wx.YES_NO|wx.ICON_QUESTION)
+        r_dlgcode=r_dlg.ShowModal()
+        if(r_dlgcode==wx.ID_YES):
+            # enable recognization
+            pass
+        else:
+            # disable recognization
+            pass
+        r_dlg.Destroy()
+        
+        # create the translation choice dialog
+        t_dlg=wx.MessageDialog(None,"Need Translation?",'Translation Choice',wx.YES_NO|wx.ICON_QUESTION)
+        t_dlgcode=t_dlg.ShowModal()
+        if(t_dlgcode==wx.ID_YES):
+            # enable translation
+            pass
+        else:
+            # disable translation
+            pass
+        t_dlg.Destroy()
 
     def OnPlay(self, evt):
         """Toggle the status to Play/Pause.
