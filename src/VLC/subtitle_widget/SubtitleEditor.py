@@ -105,27 +105,16 @@ import os
 import wx.lib.platebtn as pbtn
 from subtitleparser import *
 from SubtitleUI import TestFrame
-class Subtitle(wx.Frame):
+class Subtitle(wx.Panel):
 	colLabels = ["homer", "marge", "bart", "lisa", "maggie"]
-	def __init__(self, parent, title):
-		super(Subtitle, self).__init__(parent, title=title, 
-			size=(380, 300))
-			
+	def __init__(self, parent, id):
+		wx.Panel.__init__(self, parent, id, 
+			size=(400, 300))
 		self.sizer=self.InitUI()
-		self.Centre()
-		   
-	def mysizer(self):
-		return self.sizer
-	def InitUI(self):
-	
-		panel = wx.Panel(self, -1)
-
-		ctrlpanel=wx.Panel(self,-1)
-	
-		
+	def InitUI(self):		
 		ctrlbar=wx.BoxSizer(wx.HORIZONTAL); 
-		save  = pbtn.PlateButton(ctrlpanel, label="Save")
-		add   = pbtn.PlateButton(ctrlpanel, label="Add")
+		save  = pbtn.PlateButton(self, label="Save",pos=(10,10))
+		add   = pbtn.PlateButton(self, label="Add",pos=(50,10))
 
 
 		# ctrlbar = wx.BoxSizer(wx.VERTICAL)
@@ -144,6 +133,8 @@ class Subtitle(wx.Frame):
 		box3.Add(save, flag=wx.RIGHT, border=5)
 		box3.Add(add,flag=wx.RIGHT,border=5)
 		box3.Add((-1, -1), 1)
+		self.Bind(wx.EVT_BUTTON, self.SaveItem, save)
+		self.Bind(wx.EVT_BUTTON, self.Additem, add)
 		# box3.Add(stop,flag=wx.RIGHT,border=5)
 		# box3.Add((-1, -1), 1)
 		# box3.Add(fullscreen,flag=wx.RIGHT,border=5)
@@ -163,8 +154,8 @@ class Subtitle(wx.Frame):
 		# ctrlbox.Add(box2, flag=wx.EXPAND | wx.BOTTOM, border=5)
 
 		
-		self.begintext=wx.StaticText(panel,-1,"Start time",(33,23));
-		self.endtext=wx.StaticText(panel,-1,"End time",(183,23));
+		self.begintext=wx.StaticText(self,-1,"Start time",(33,43));
+		self.endtext=wx.StaticText(self,-1,"End time",(183,43));
 		# ctrlbar.Add(save, flag=wx.RIGHT, border=5)
 		# ctrlbar.Add(add,flag=wx.RIGHT,border=5)
 		# # ctrlbar.Add(stop,flag=wx.LEFT,border=5)
@@ -183,52 +174,57 @@ class Subtitle(wx.Frame):
 		# right.Add(subrow,flag=wx.EXPAND);
 		
 		# panel.SetSizer(right);
-		self.text=wx.StaticText(panel,-1,"Content",(170,40))
+		self.text=wx.StaticText(self,-1,"Content",(170,60))
 		
 
-		self.TextCtrl=wx.TextCtrl(panel, pos=(3, 60), size=(350, 50))
-		self.num=wx.TextCtrl(panel,pos=(3,23),size=(28,20))
-		self.begintime=wx.TextCtrl(panel,pos=(80,23),size=(100,20))
-		self.endtime=wx.TextCtrl(panel,pos=(230,23),size=(100,20))
+		self.TextCtrl=wx.TextCtrl(self, pos=(3, 80), size=(350, 50))
+		self.num=wx.TextCtrl(self,pos=(3,43),size=(28,20))
+		self.begintime=wx.TextCtrl(self,pos=(80,43),size=(100,20))
+		self.endtime=wx.TextCtrl(self,pos=(230,43),size=(100,20))
 
 		samplelist=['1 00:00','2 00:01'];
-		self.listBox=wx.ListBox(panel,-1,(3,120),(350,100),samplelist,wx.LB_SINGLE)
+		self.listBox=wx.ListBox(self,-1,(3,140),(350,100),samplelist,wx.LB_SINGLE)
 		self.listBox.SetSelection(1)
 
-		menubar = wx.MenuBar()
-		filem = wx.Menu()
-		editm = wx.Menu()
-		helpm = wx.Menu()
-		menubar.Append(filem, '&File')
-		menubar.Append(editm, '&Edit')
-		menubar.Append(helpm, '&Help')
-		openb=filem.Append(wx.NewId(),u"Open","Open a File")
-		saveb=filem.Append(wx.NewId(),"Save","Save a File")
-		saveitemb=editm.Append(wx.NewId(),"save subtitle","save");
-		additemb=editm.Append(wx.NewId(),"add subtitle","add");
+		# menubar = wx.MenuBar()
+		# filem = wx.Menu()
+		# editm = wx.Menu()
+		# helpm = wx.Menu()
+		# menubar.Append(filem, '&File')
+		# menubar.Append(editm, '&Edit')
+		# menubar.Append(helpm, '&Help')
+		# openb=filem.Append(wx.NewId(),u"Open","Open a File")
+		# saveb=filem.Append(wx.NewId(),"Save","Save a File")
+		# saveitemb=editm.Append(wx.NewId(),"save subtitle","save");
+		# additemb=editm.Append(wx.NewId(),"add subtitle","add");
 
-		self.Bind(wx.EVT_MENU, self.Additem, additemb)
-		self.Bind(wx.EVT_MENU, self.SaveItem, saveitemb)
-		self.Bind(wx.EVT_MENU, self.OpenFile, openb)
-		self.Bind(wx.EVT_MENU, self.SaveFile, saveb)
+		# self.Bind(wx.EVT_MENU, self.Additem, additemb)
+		# self.Bind(wx.EVT_MENU, self.SaveItem, saveitemb)
+		# self.Bind(wx.EVT_MENU, self.OpenFile, openb)
+		# self.Bind(wx.EVT_MENU, self.SaveFile, saveb)
 		self.Bind(wx.EVT_LISTBOX_DCLICK,self.ChooseOneItem,self.listBox);
-		self.SetMenuBar(menubar)
-		statusbar=self.CreateStatusBar()
+		# self.SetMenuBar(menubar)
+		# statusbar=self.CreateStatusBar()
 
 		ctrlbox.Add(box3, 1, wx.EXPAND)
-		ctrlpanel.SetSizer(ctrlbox)
+		
 		# Put everything togheter
-		sizer = wx.BoxSizer(wx.VERTICAL)
+		self.sizer = wx.BoxSizer(wx.VERTICAL)
 
-		BigSizer = wx.BoxSizer(wx.HORIZONTAL)
+		self.BigSizer = wx.BoxSizer(wx.HORIZONTAL)
 
 		# sizer.Add(self.videopanel, 1, flag=wx.EXPAND)
-		sizer.Add(ctrlpanel, flag=wx.EXPAND | wx.BOTTOM | wx.TOP, border=0)
-		sizer.Add(panel, flag=wx.EXPAND | wx.BOTTOM | wx.TOP, border=0)
-		BigSizer.Add(sizer,flag=wx.EXPAND)
-		self.SetSizer(BigSizer)
-		return BigSizer
+		self.sizer.Add(ctrlbox, flag=wx.EXPAND | wx.BOTTOM | wx.TOP, border=0)
+		# self.sizer.Add(subpanel, flag=wx.EXPAND | wx.BOTTOM | wx.TOP, border=0)
+
+
+		####################################CUTTING LINE######################################
+
+		self.BigSizer.Add(self.sizer,flag=wx.EXPAND)
+		self.SetSizer(self.BigSizer)
+		# return self.BigSizer
 		# hbox.Add(frid, proportion=1, flag=wx.ALL|wx.EXPAND, border=15)
+
 	def ChooseOneItem(self,event):
 		index=self.listBox.GetSelection()
 		content=self.listBox.GetString(index)
@@ -319,10 +315,25 @@ class Subtitle(wx.Frame):
 
 
 
+class Example(wx.Frame):
+		   
+	def __init__(self, *args, **kw):
+		super(Example, self).__init__(*args, **kw) 
 		
+		self.InitUI()
+		
+	def InitUI(self):    
+
+		panel = wx.Panel(self)
+		lnk = Subtitle(panel, -1)
+		# motto.SetFont(wx.Font(9, wx.SWISS, wx.NORMAL, wx.BOLD, False, 'Verdana'))
+
+		self.SetSize((400, 400))
+		self.Centre()
+		self.Show(True)
 
 
 if __name__ == '__main__':
 	app = wx.App(redirect=False)
-	Subtitle(None, title='Subtitle')
+	Example(None);
 	app.MainLoop()
