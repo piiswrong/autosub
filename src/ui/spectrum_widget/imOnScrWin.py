@@ -99,11 +99,20 @@ class ImageWindow(wx.ScrolledWindow):
                 dc.DrawLine(self.RiX,0,
                             self.RiX, 150)
         #Draw a transparent rectangle to emphasize the selected area
-        #if self.LeftClickFlag == 1&& self.RightClickFlag == 1 && self.LeX!=self.RiX:
-                
-        self.LeftClickFlag=0
-        self.RightClickFlag=0
-        Color = wx.Colour(139,0,255,100)
+        if(self.LeftClickFlag == 1 and self.RightClickFlag == 1 and self.LeX!=self.RiX):
+                Colour = wx.Colour(139, 0, 255, 100) #notice the alpha channel
+                brush = wx.Brush(Colour)
+                if self.RiX > self.LeX:
+                    width = self.RiX - self.LeX
+                    x = self.LeX
+                else:
+                    width = self.LeX- self.RiX
+                    x = self.RiX
+                height  = self.bitmap.GetHeight()
+                #rect = wx.Rect(x, 0, width, height)
+                pdc = wx.GCDC(dc)
+                pdc.SetBrush(brush)
+                pdc.DrawRectangle(x, 0, width, height)
         del odc
         dc.SetPen(wx.Pen('white',1))
         dc.SetTextForeground('white')
