@@ -220,7 +220,9 @@ class MyFrame(wx.Frame):
         # you can display all kind of files, having as title "Choose a file".
         dlg = wx.FileDialog(self, "Choose a file", user.home, "",
                             "*.*", wx.OPEN)
+        flag=0
         if dlg.ShowModal() == wx.ID_OK:
+            flag=1 #OK to play the video
             dirname = dlg.GetDirectory()
             filename = dlg.GetFilename()
             # Creation
@@ -245,41 +247,42 @@ class MyFrame(wx.Frame):
         # finally destroy the dialog
         dlg.Destroy()
         
-        # create the recognization choice dialog
-        r_dlg=wx.MessageDialog(None,"Need recognization?",'Recognization Choice',wx.YES_NO|wx.ICON_QUESTION)
-        r_dlgcode=r_dlg.ShowModal()
-        if(r_dlgcode==wx.ID_YES):
-            # enable recognization
-            origin_lan=["English","Japanese"]
-            origin_lan_diag=wx.SingleChoiceDialog(None,"Choose the origin language","Origin Language Choice",origin_lan)
-            if origin_lan_diag.ShowModal()==wx.ID_OK:
-                print"The origin language is:%s\n"%origin_lan_diag.GetStringSelection()
-                #enable the back program
-                pass
-            origin_lan_diag.Destroy()
+        if flag==1:
+            # create the recognization choice dialog
+            r_dlg=wx.MessageDialog(None,"Need recognization?",'Recognization Choice',wx.YES_NO|wx.ICON_QUESTION)
+            r_dlgcode=r_dlg.ShowModal()
+            if(r_dlgcode==wx.ID_YES):
+                # enable recognization
+                origin_lan=["English","Japanese"]
+                origin_lan_diag=wx.SingleChoiceDialog(None,"Choose the origin language","Origin Language Choice",origin_lan)
+                if origin_lan_diag.ShowModal()==wx.ID_OK:
+                    print"The origin language is:%s\n"%origin_lan_diag.GetStringSelection()
+                    #enable the back program
+                    pass
+                origin_lan_diag.Destroy()
             
-        else:
-            # disable recognization
-            pass
-        r_dlg.Destroy()
-        
-        # create the translation choice dialog
-        t_dlg=wx.MessageDialog(None,"Need Translation?",'Translation Choice',wx.YES_NO|wx.ICON_QUESTION)
-        t_dlgcode=t_dlg.ShowModal()
-        if(t_dlgcode==wx.ID_YES):
-            # enable translation
-            translate_lan=["English","Japanese","Chinese"]
-            translate_lan_diag=wx.SingleChoiceDialog(None,"Choose the translate language","Translate Language Choice",translate_lan)
-            if translate_lan_diag.ShowModal()==wx.ID_OK:
-                print"The translate language is:%s\n"%translate_lan_diag.GetStringSelection()
-                #enable the back program
+            else:
+                # disable recognization
                 pass
-            translate_lan_diag.Destroy()
-            pass
-        else:
-            # disable translation
-            pass
-        t_dlg.Destroy()
+                r_dlg.Destroy()
+        
+            # create the translation choice dialog
+            t_dlg=wx.MessageDialog(None,"Need Translation?",'Translation Choice',wx.YES_NO|wx.ICON_QUESTION)
+            t_dlgcode=t_dlg.ShowModal()
+            if(t_dlgcode==wx.ID_YES):
+                # enable translation
+                translate_lan=["English","Japanese","Chinese"]
+                translate_lan_diag=wx.SingleChoiceDialog(None,"Choose the translate language","Translate Language Choice",translate_lan)
+                if translate_lan_diag.ShowModal()==wx.ID_OK:
+                    print"The translate language is:%s\n"%translate_lan_diag.GetStringSelection()
+                    #enable the back program
+                    pass
+                translate_lan_diag.Destroy()
+                pass
+            else:
+                # disable translation
+                pass
+            t_dlg.Destroy()
 
         # Finally Play~FIXME: this should be made cross-platform
         self.OnPlay(None)
