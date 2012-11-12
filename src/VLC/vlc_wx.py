@@ -587,6 +587,17 @@ class MyFrame(wx.Frame):
                 dlg.Destroy()
                 
                 if flag==1:
+                        # create the new dialog to choose the recognization and translation
+                        select_dialog=SelectDialog(None,"Choice")
+                        select_dialog.ShowModal()
+
+
+
+
+
+
+
+                        
                         # create the recognization choice dialog
                         r_dlg=wx.MessageDialog(None,"Need recognization?",'Recognization Choice',wx.YES_NO|wx.ICON_QUESTION)
                         r_dlgcode=r_dlg.ShowModal()
@@ -752,7 +763,49 @@ class MyFrame(wx.Frame):
                 edialog.ShowModal()
         def OnFeedBack(self, evt):
                 feedbackdialog=FeedBackDialog(None,"FeedBack")
-                feedbackdialog.ShowModal()               
+                feedbackdialog.ShowModal()
+
+
+class SelectDialog(wx.Dialog):
+        def __init__(self,parent,title=""):
+                super(SelectDialog,self).__init__(parent,title=title)
+
+                #Attributes
+                self.isrecg_checkbox=wx.CheckBox(self,label="Need Recognized")
+                self.notrecg_checkbox=wx.CheckBox(self,label="Not Need Recognized")
+                self.istran_checkbox=wx.CheckBox(self,label="Need Translation")
+                self.nottran_checkbox=wx.CheckBox(self,label="Not Need Translation")
+                src_lan=["English","Japanese"]
+                tran_lan=["Chinese","Japanese","English"]
+                self.recg_choice=wx.Choice(self,choices=src_lan)
+                self.tran_choice=wx.Choice(self,choices=tran_lan)
+
+                # Layout
+                self.__DoLayout()
+                self.SetInitialSize()
+
+        def __DoLayout(self):
+                sizer=wx.GridBagSizer(vgap=8,hgap=8)
+                sizer.Add(wx.StaticText(self, label="Recognization:"),(1,0))
+                sizer.Add(self.isrecg_checkbox,(1,1))
+                sizer.Add(self.notrecg_checkbox,(1,3))
+                sizer.Add(wx.StaticText(self, label="Translation:"),(5,0))
+                sizer.Add(self.istran_checkbox,(5,1))
+                sizer.Add(self.nottran_checkbox,(5,3))
+                sizer.Add(self.recg_choice,(2,1))
+                sizer.Add(self.tran_choice,(6,1))
+                button=wx.Button(self,wx.ID_OK)                
+                button.SetDefault()
+                sizer.Add(button,(8,2))                
+                self.SetSizer(sizer)
+                self.Bind(wx.EVT_CHECKBOX,self.OnCheck)
+
+        def OnCheck(self,event):
+                e_obj=event.GetEventObject()
+                if e_obj==self.isrecg_checkbox:
+                        
+
+                
                 
                 
 class FeedBackDialog(wx.Dialog):
