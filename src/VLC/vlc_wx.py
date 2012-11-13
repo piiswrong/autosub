@@ -2,27 +2,24 @@
 import wx # 2.8
 import wx.lib.platebtn as pbtn
 import sys
-sys.path.append('myvlc')
-sys.path.append('subtitle_widget')
-import vlc
+import myvlc.vlc as vlc
 
 # import standard libraries
 import os
 import user
-from SubtitleEditor import * 
+from subtitle_widget.SubtitleEditor import * 
 
 class MyFrame(wx.Frame):
         """The main window
         """
 
         def __init__(self,title):
-                frame=wx.Frame.__init__(self, None, -1, title)
-                
+                frame=wx.Frame.__init__(self, None, -1, title)               
                 
                 #Menu Bar
                 self.frame_menubar=wx.MenuBar()
                 #  File Menu
-                self.icon=wx.Icon('autosub.ico',wx.wx.BITMAP_TYPE_ICO);
+                self.icon=wx.Icon('./VLC/autosub.ico',wx.wx.BITMAP_TYPE_ICO);
                 self.SetIcon(self.icon);
                 self.file_menu=wx.Menu()
                 self.file_menu.Append(1,"&Open \tCtrl+O")
@@ -110,8 +107,6 @@ class MyFrame(wx.Frame):
                 self.buffertime=wx.StaticText(ctrlpanel, -1, "00:00/00:00", size=(10,15))
                 
                 pause  = pbtn.PlateButton(ctrlpanel, label="Pause")
-
-
                 play   = pbtn.PlateButton(ctrlpanel, label="Play")
                 stop   = pbtn.PlateButton(ctrlpanel, label="Stop")
                 volume = pbtn.PlateButton(ctrlpanel, label="Volume")        
@@ -122,7 +117,7 @@ class MyFrame(wx.Frame):
 
 
                 # Add the picture to the button
-                feedbackbmp=wx.Bitmap("./smile.gif",wx.BITMAP_TYPE_GIF)
+                feedbackbmp=wx.Bitmap("./VLC/smile.gif",wx.BITMAP_TYPE_GIF)
                 feedbackbmp.SetSize(size=(15,15))
                 self.feedback.SetBitmap(bmp=feedbackbmp)
 
@@ -150,8 +145,7 @@ class MyFrame(wx.Frame):
                 box3 = wx.BoxSizer(wx.HORIZONTAL)
                 box4 = wx.BoxSizer(wx.HORIZONTAL)
                 box5 = wx.BoxSizer(wx.HORIZONTAL)
-                # box1 contains the timeslider
-         
+                # box1 contains the timeslider         
                 box1.Add(self.timeslider,1)
                 # box2 contains the bufferslider
                 box2.Add(self.buffergauge,1)
@@ -242,7 +236,8 @@ class MyFrame(wx.Frame):
                         dirname = dlg.GetDirectory()
                         filename = dlg.GetFilename()
                         # Creation
-                        self.Media = self.Instance.media_new(unicode(os.path.join(dirname, filename)))
+                        self.mediapath=unicode(os.path.join(dirname, filename))
+                        self.Media = self.Instance.media_new(self.mediapath)
                         #m=self.Instance.media_new(r'D:\shiyan\number3\New folder\1.rmvb')
                         self.player.set_media(self.Media)
                         # Report the title of the file chosen
@@ -263,8 +258,8 @@ class MyFrame(wx.Frame):
                         dlg.Destroy()
                 
                         # create the new dialog to choose the recognization and translation
-                        select_dialog=SelectDialog(None,"Choice")
-                        select_dialog.ShowModal()
+                        self.select_dialog=SelectDialog(None,"Choice")
+                        self.select_dialog.ShowModal()
                         # Finally Play~FIXME: this should be made cross-platform
                         self.OnPlay(None)
                 else:
@@ -284,7 +279,7 @@ class MyFrame(wx.Frame):
                         if self.player.play() == -1:
                                 self.errorDialog("Unable to play.")
                         else:
-                                self.timer.Start()
+                                self.timer.Start(100)
                                 
 
         def OnPause(self, evt):
@@ -372,8 +367,6 @@ class MyFrame(wx.Frame):
                 """
                 settime = self.timeslider.GetValue()
                 self.player.set_time(settime)
-
-
                 
 
         def OnSetBuffer(self, evt):                
@@ -383,10 +376,7 @@ class MyFrame(wx.Frame):
 
         def OnToggleFullScreen(self, evt):
                 is_fullscreen=self.IsFullScreen()
-                self.ShowFullScreen(show= not is_fullscreen)
-
-
-                
+                self.ShowFullScreen(show= not is_fullscreen)               
 
 
         def errorDialog(self, errormessage):
@@ -485,18 +475,3 @@ class FeedBackDialog(wx.Dialog):
         def GetSuggestion(self):
                 return self.suggestion.GetValue()
 
-        
-
-
-if __name__ == "__main__":
-        # Create a wx.App(), which handles the windowing system event loop
-        app = wx.PySimpleApp()
-        # Create the window containing our small media player
-        PlayerFrame = MyFrame("AutoSub")
-        # Subtitle(PlayerFrame, title='Subtitle',positon=(1100,300))
-        PlayerFrame.SetPosition((0,0))
-        app.SetTopWindow(PlayerFrame)
-        # show the player window centred and run the application
-        PlayerFrame.Centre()
-        PlayerFrame.Show()
-        app.MainLoop()
