@@ -585,55 +585,9 @@ class MyFrame(wx.Frame):
 
                 # finally destroy the dialog
                 dlg.Destroy()
-                
-                if flag==1:
-                        # create the new dialog to choose the recognization and translation
-                        select_dialog=SelectDialog(None,"Choice")
-                        select_dialog.ShowModal()
-
-
-
-
-
-
-
-                        
-                        # create the recognization choice dialog
-                        r_dlg=wx.MessageDialog(None,"Need recognization?",'Recognization Choice',wx.YES_NO|wx.ICON_QUESTION)
-                        r_dlgcode=r_dlg.ShowModal()
-                        if(r_dlgcode==wx.ID_YES):
-                                # enable recognization
-                                origin_lan=["English","Japanese"]
-                                origin_lan_diag=wx.SingleChoiceDialog(None,"Choose the origin language","Origin Language Choice",origin_lan)
-                                if origin_lan_diag.ShowModal()==wx.ID_OK:
-                                        print"The origin language is:%s\n"%origin_lan_diag.GetStringSelection()
-                                        #enable the back program
-                                        pass
-                                origin_lan_diag.Destroy()
-                        
-                        else:
-                                # disable recognization
-                                pass
-                                r_dlg.Destroy()
-                
-                        # create the translation choice dialog
-                        t_dlg=wx.MessageDialog(None,"Need Translation?",'Translation Choice',wx.YES_NO|wx.ICON_QUESTION)
-                        t_dlgcode=t_dlg.ShowModal()
-                        if(t_dlgcode==wx.ID_YES):
-                                # enable translation
-                                translate_lan=["English","Japanese","Chinese"]
-                                translate_lan_diag=wx.SingleChoiceDialog(None,"Choose the translate language","Translate Language Choice",translate_lan)
-                                if translate_lan_diag.ShowModal()==wx.ID_OK:
-                                        print"The translate language is:%s\n"%translate_lan_diag.GetStringSelection()
-                                        #enable the back program
-                                        pass
-                                translate_lan_diag.Destroy()
-                                pass
-                        else:
-                                # disable translation
-                                pass
-                        t_dlg.Destroy()
-
+                # create the new dialog to choose the recognization and translation
+                select_dialog=SelectDialog(None,"Choice")
+                select_dialog.ShowModal()
                 # Finally Play~FIXME: this should be made cross-platform
                 self.OnPlay(None)
 
@@ -771,14 +725,14 @@ class SelectDialog(wx.Dialog):
                 super(SelectDialog,self).__init__(parent,title=title)
 
                 #Attributes
-                self.isrecg_checkbox=wx.CheckBox(self,label="Need Recognized")
-                self.notrecg_checkbox=wx.CheckBox(self,label="Not Need Recognized")
-                self.istran_checkbox=wx.CheckBox(self,label="Need Translation")
-                self.nottran_checkbox=wx.CheckBox(self,label="Not Need Translation")
+                self.isrecg_radio=wx.RadioButton(self,label="Need Recognized",style=wx.RB_GROUP)
+                self.notrecg_radio=wx.RadioButton(self,label="Not Need Recognized")
+                self.istran_radio=wx.RadioButton(self,label="Need Translation",style=wx.RB_GROUP)
+                self.nottran_radio=wx.RadioButton(self,label="Not Need Translation")
                 src_lan=["English","Japanese"]
                 tran_lan=["Chinese","Japanese","English"]
-                self.recg_choice=wx.Choice(self,choices=src_lan)
-                self.tran_choice=wx.Choice(self,choices=tran_lan)
+                self.recg_box=wx.ComboBox(self,-1,value="English",choices=src_lan,style=wx.CB_READONLY)
+                self.tran_box=wx.ComboBox(self,-1,value="Chinese",choices=tran_lan,style=wx.CB_READONLY)
 
                 # Layout
                 self.__DoLayout()
@@ -787,23 +741,19 @@ class SelectDialog(wx.Dialog):
         def __DoLayout(self):
                 sizer=wx.GridBagSizer(vgap=8,hgap=8)
                 sizer.Add(wx.StaticText(self, label="Recognization:"),(1,0))
-                sizer.Add(self.isrecg_checkbox,(1,1))
-                sizer.Add(self.notrecg_checkbox,(1,3))
-                sizer.Add(wx.StaticText(self, label="Translation:"),(5,0))
-                sizer.Add(self.istran_checkbox,(5,1))
-                sizer.Add(self.nottran_checkbox,(5,3))
-                sizer.Add(self.recg_choice,(2,1))
-                sizer.Add(self.tran_choice,(6,1))
+                sizer.Add(self.isrecg_radio,(1,3))
+                sizer.Add(self.notrecg_radio,(1,1))
+                sizer.Add(wx.StaticText(self, label="Translation:"),(3,0))
+                sizer.Add(self.istran_radio,(3,3))
+                sizer.Add(self.nottran_radio,(3,1))
+                sizer.Add(self.recg_box,(1,4))
+                sizer.Add(self.tran_box,(3,4))
+                sizer.Add((1,2),(3,2))
                 button=wx.Button(self,wx.ID_OK)                
                 button.SetDefault()
-                sizer.Add(button,(8,2))                
+                sizer.Add(button,(5,2))                
                 self.SetSizer(sizer)
-                self.Bind(wx.EVT_CHECKBOX,self.OnCheck)
-
-        def OnCheck(self,event):
-                e_obj=event.GetEventObject()
-                if e_obj==self.isrecg_checkbox:
-                        
+                       
 
                 
                 
