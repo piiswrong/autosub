@@ -1,7 +1,7 @@
 import core.ffmpeg_decoder as fd
 import core.sub_generator as sg
 from core.naive_vad2 import *
-import ui.vlc_wx as vlc
+import VLC.vlc_wx as vlc
 import sys
 
 if __name__ == '__main__':
