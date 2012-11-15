@@ -10,6 +10,9 @@ class data_stream_handle(object):
         self.stream = stream
         self.pos = 0
         self.i = 0
+
+    def has_data(self, n = 1):
+        return self.stream.has_data(self, n)
     
     def read(self, n = constants.MAX_INT, res = None):
         if res is None:
@@ -63,6 +66,14 @@ class data_stream(object):
         
     def get_total_samples(self):
         return self.total_samples
+
+    def has_data(self, handle, n = 1):
+        self.lock.acquire()
+        res = False
+        if self.tail_pos - handle.pos >= n:
+            res = True
+        self.lock.release()
+        return res
     
     def read(self, handle, n = constants.MAX_INT, res = None):
         if res is None:
