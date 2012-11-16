@@ -25,20 +25,27 @@ class MainFrame(vlc_wx.MyFrame):
             lang_to=lan[self.select_dialog.targetlan]
 
         source=self.mediapath
-        print source
-        print lang_from
-        print lang_to
         # Set target name
         if not target:
             target = source[:source.rfind('.')] + '.srt'
-            
+        self.subtitle=target    
         dec = fd.ffmpeg_decoder(source)
         vad = naive_vad(dec.ostream.get_handle())
         sub = sg.sub_generator(vad.ostream.get_handle(), source, target, lang_from = lang_from, lang_to = lang_to)
-        ohandle = sub.ostream.get_handle()
+        self.ohandle = sub.ostream.get_handle()
         dec.start()
         vad.start()
-        sub.start()            
+        sub.start()
+
+    def OnTimer(self,evt):
+        super(MainFrame, self).OnTimer(self)
+        
+        self.player.video_set_subtitle_file(None)
+        self.player.video_set_subtitle_file(self.subtitle)
+        if self.ohandle.has_data(1):
+            (start,end,text)=self.ohandle.read(1)[2][0][0]
+        
+        # Link with subtitle
 
 if __name__ == '__main__':
         # Create a wx.App(), which handles the windowing system event loop

@@ -394,10 +394,8 @@ class SelectDialog(wx.Dialog):
                 super(SelectDialog,self).__init__(parent,title=title)
 
                 # Attributes
-                self.notrecg_radio=wx.RadioButton(self,label="Not Need Recognized",style=wx.RB_GROUP)
-                self.isrecg_radio=wx.RadioButton(self,label="Need Recognized")
-                self.nottran_radio=wx.RadioButton(self,label="Not Need Translation",style=wx.RB_GROUP)
-                self.istran_radio=wx.RadioButton(self,label="Need Translation")
+                self.checkbox1=wx.CheckBox(self,label="Need Recognization")
+                self.checkbox2=wx.CheckBox(self,label="Need Translation")
                 src_lan=["English","Japanese"]
                 tran_lan=["Chinese","Japanese","English"]
                 self.recg_box=wx.ComboBox(self,-1,value="English",choices=src_lan,style=wx.CB_READONLY)
@@ -415,16 +413,15 @@ class SelectDialog(wx.Dialog):
                 self.Bind(wx.EVT_BUTTON,self.OnDecide,self.button)                
 
         def __DoLayout(self):
-                sizer=wx.GridBagSizer(vgap=8,hgap=8)
-                sizer.Add(wx.StaticText(self, label="Recognization:"),(1,0))
-                sizer.Add(self.isrecg_radio,(1,3))
-                sizer.Add(self.notrecg_radio,(1,1))
-                sizer.Add(wx.StaticText(self, label="Translation:"),(3,0))
-                sizer.Add(self.istran_radio,(3,3))
-                sizer.Add(self.nottran_radio,(3,1))
-                sizer.Add(self.recg_box,(1,4))
-                sizer.Add(self.tran_box,(3,4))
-                sizer.Add((1,2),(3,2))
+                sizer=wx.GridBagSizer(vgap=8,hgap=8)                
+                sizer.Add(self.checkbox1,(1,1))
+                sizer.Add(self.checkbox2,(3,1))
+                sizer.Add(wx.StaticText(self,-1,"Source Language:"),(1,2))
+                sizer.Add(wx.StaticText(self,-1,"Target Language:"),(3,2))
+                sizer.Add(self.recg_box,(1,3))
+                sizer.Add(self.tran_box,(3,3))
+                sizer.Add((1,4),(1,5))
+                sizer.Add((3,4),(3,5))
                 sizer.Add(self.button,(5,2))                
                 self.SetSizer(sizer)
 
@@ -432,9 +429,9 @@ class SelectDialog(wx.Dialog):
         def OnDecide(self,evt):
                 self.sorcelan=self.recg_box.GetValue()
                 self.targetlan=self.tran_box.GetValue()        
-                if self.isrecg_radio.GetValue()==True:
+                if self.checkbox1.GetValue()==True:
                         self.isrecognize=True                
-                if self.istran_radio.GetValue()==True:
+                if self.checkbox2.GetValue()==True:
                         self.istranslate=True
                 self.Destroy()
                              
