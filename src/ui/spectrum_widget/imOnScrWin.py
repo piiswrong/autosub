@@ -6,7 +6,6 @@ import core.ffmpeg_decoder as fd
 import core.spectrum as sp
 import matplotlib.pyplot as plt
 import numpy as np
-import RulerCtrl as RC
 
 import matplotlib.cm as cm
 
@@ -32,8 +31,7 @@ while handle.more_data():
                 iter = iter +1
                 #plt.imshow(np.log(p.T+1))
                 #plt.show()
-        #vector = vector/np.amax(vector) * 255.0
-        vector = vector * 10
+        vector = vector/np.amax(vector) * 255.0
         vector = [vector, vector, vector]
         vector = np.dstack(vector)
         #plt.imsave(path, vector, cmap = cm.gray)
@@ -69,13 +67,14 @@ class ImageWindow(wx.ScrolledWindow):
 
     def SetBitmap(self, bitmap):
         self.bitmap = bitmap
-        self.buffer = wx.EmptyBitmap(bitmap.GetWidth(), bitmap.GetHeight()+15)
+        #self.buffer = wx.EmptyBitmap(bitmap.GetWidth(), bitmap.GetHeight()+15)
+        self.buffer = self.bitmap
         
         
     def OnPaint(self, event):
         #dc = wx.BufferedPaintDC(self, self.bitmap)
         dc = wx.BufferedPaintDC(self, self.buffer, wx.BUFFER_VIRTUAL_AREA)
-        dc.DrawBitmap(self.bitmap, 0, 0)
+        #dc.DrawBitmap(self.bitmap, 0, 0)
         odc=wx.DCOverlay(self.overlay, dc)
         odc.Clear()
         if self.LeftClickFlag==1:
@@ -102,13 +101,14 @@ class ImageWindow(wx.ScrolledWindow):
                 pdc.SetBrush(brush)
                 pdc.DrawRectangle(x, 0, width, height)
         del odc
-        dc.SetPen(wx.Pen('white',1))
+        #SKIP THE DRAWING OF RULER WHICH SEVERELY STUCK THE RENDERING
+        """dc.SetPen(wx.Pen('white',1))
         dc.SetTextForeground('white')
         for i in range(-self.CalcScrolledPosition(0,0)[0], self.bitmap.GetWidth(), 10):
                 dc.DrawLine(i, self.bitmap.GetHeight(), i, self.bitmap.GetHeight()+5)
                 font = wx.Font(7, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_LIGHT)
                 dc.SetFont(font)
-                dc.DrawText(str(i), i, self.bitmap.GetHeight()+5)
+                dc.DrawText(str(i), i, self.bitmap.GetHeight()+5)"""
         event.Skip()
             
     def OnScroll(self, evt):
@@ -130,15 +130,12 @@ class ImageWindow(wx.ScrolledWindow):
         self.Refresh()
         event.Skip()
             
-class Panel1(wx.Frame):
+class Test_Frame(wx.Frame):
     def __init__(self):
 
-        wx.Frame.__init__(self, None, -1, ' spectrum widget')
-        self.orim = wx.ImageFromBuffer(int(np.size(specW , axis = 1)), int(np.size(specW, axis = 0)), np.uint8(specW))
+        wx.Frame.__init__(self, None, -1, 'spectrum widget')
         #self.orim = Image.fromarray(specW)
-        self.im = self.orim
-        self.bm = self.im.ConvertToBitmap()
-        self.wind = ImageWindow(self)
+        self.spec = specW
 
         panel = wx.Panel(self, -1)
         
@@ -149,25 +146,45 @@ class Panel1(wx.Frame):
                         size=(50, 150), style=wx.SL_VERTICAL| wx.SL_AUTOTICKS | wx.SL_LABELS )
         self.sld1.SetTickFreq(20, 1)
 
-
+        self.Bind(wx.EVT_MENU, self.LeftButton, id=1)
+        self.Bind(wx.EVT_MENU, self.RightButton, id=2)
+        self.Bind(wx.EVT_MENU, self.LeftText, id=1)
+        acceltbl = wx.AcceleratorTable([(wx.ACCEL_CTRL,ord('Z'),1),(wx.ACCEL_CTRL,ord('X'),2)])
+        self.SetAcceleratorTable(acceltbl)
+        
         #ADD TWO BUTTONS TO MANIPULATE THE LEFT AND RIGHT BORDER
         self.button1 = wx.Button(panel, id=1, label='left', pos = (120,10), size = (70,25))
         self.button2 = wx.Button(panel, id=2, label='right', pos=(120, 40), size = (70,25))
         self.button1.Bind(wx.EVT_BUTTON, self.LeftButton)
         self.button2.Bind(wx.EVT_BUTTON, self.RightButton)
+        self.button1.Bind(wx.EVT_BUTTON, self.LeftText)
+        self.button2.Bind(wx.EVT_BUTTON, self.RightText)
+        self.textleft = wx.TextCtrl(panel, id=3, pos=(120, 70), size=(70, 25))
+        self.textright = wx.TextCtrl(panel, id=4, pos=(120, 100), size=(70, 25))
         
+        
+        self.orim = wx.ImageFromBuffer(int(np.size(specW , axis = 1)), int(np.size(specW, axis = 0)), np.uint8(specW))
+        self.im = self.orim
+        self.bm = self.im.ConvertToBitmap()
+
+        
+        self.wind = ImageWindow(self)
         self.wind.SetSize((300,150))
         self.wind.SetBitmap(self.im.ConvertToBitmap())
         wx.EVT_SLIDER(self.sld, self.sld.GetId(),self.sliderUpdate1)
         wx.EVT_SLIDER(self.sld1, self.sld1.GetId(),self.sliderUpdate2)
+        #UPDATE THE TEXT ON LEFT CLICKING
+        self.wind.Bind(wx.EVT_LEFT_DOWN, self.LeftText)
+        self.wind.Bind(wx.EVT_RIGHT_DOWN, self.RightText)
+        self.sld1.Bind(wx.EVT_SLIDER, self.sliderUpdate2)
         self.wind.FitInside()
-        self.wind.SetScrollbars(1,0, self.im.GetWidth(), 400)
+        self.wind.SetScrollbars(1,0, self.im.GetWidth(), 200)
         
-
         
-        sizer = wx.BoxSizer ()
+        sizer = wx.BoxSizer (wx.HORIZONTAL)
         sizer.Add(self.wind, 1, wx.EXPAND, 0)
         sizer.Add(panel, wx.ALIGN_LEFT)
+        #sizer.SetSize((500,200))
         #sizer.Add(self.ruler)
         self.SetSizer(sizer)
         self.SetSize((500,200))
@@ -184,7 +201,12 @@ class Panel1(wx.Frame):
         self.wind.SetBitmap(self.im.ConvertToBitmap())
 
     def sliderUpdate2(self, event):
-        pass
+        self.pos = self.sld1.GetValue()
+        ratio = self.pos/200
+        self.spec = self.spec * ratio
+        self.im = wx.ImageFromBuffer(int(np.size(self.spec, axis = 1)), int(np.size(self.spec, axis = 0)), np.uint8(self.spec))
+        self.wind.SetBitmap(self.im.ConvertToBitmap())
+        self.wind.Refresh()
 
     def LeftButton(self, event):
         self.wind.LeX = self.wind.LeX -1
@@ -196,9 +218,21 @@ class Panel1(wx.Frame):
         self.wind.Refresh()
         event.Skip()
 
+    def LeftText(self, event):
+        self.textleft.Clear()
+        if self.wind.LeftClickFlag ==1:
+                self.textleft.WriteText(str(self.wind.LeX))
+        event.Skip()
+
+    def RightText(self, event):
+        self.textright.Clear()
+        if self.wind.RightClickFlag==1:
+                self.textright.WriteText(str(self.wind.RiX))
+        event.Skip()
+        
 if __name__=='__main__':
     app = wx.PySimpleApp()
-    f = Panel1()
+    f = Test_Frame()
     f.Show()
     app.MainLoop()
         
