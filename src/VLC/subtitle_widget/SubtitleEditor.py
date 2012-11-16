@@ -115,7 +115,7 @@ class Subtitle(wx.Panel):
 		ctrlbar=wx.BoxSizer(wx.HORIZONTAL); 
 		save  = pbtn.PlateButton(self, label="Save",pos=(10,10))
 		add   = pbtn.PlateButton(self, label="Add",pos=(50,10))
-
+		delete = pbtn.PlateButton(self,label="Delete",pos=(90,10))
 
 		# ctrlbar = wx.BoxSizer(wx.VERTICAL)
 		ctrlbox = wx.BoxSizer(wx.VERTICAL)
@@ -132,9 +132,11 @@ class Subtitle(wx.Panel):
 		# box3 contains some buttons and the volume controls
 		box3.Add(save, flag=wx.RIGHT, border=5)
 		box3.Add(add,flag=wx.RIGHT,border=5)
+		box3.Add(delete,flag=wx.RIGHT,border=5)
 		box3.Add((-1, -1), 1)
 		self.Bind(wx.EVT_BUTTON, self.SaveItem, save)
 		self.Bind(wx.EVT_BUTTON, self.Additem, add)
+		self.Bind(wx.EVT_BUTTON,self.deleteitem,delete)
 		# box3.Add(stop,flag=wx.RIGHT,border=5)
 		# box3.Add((-1, -1), 1)
 		# box3.Add(fullscreen,flag=wx.RIGHT,border=5)
@@ -289,6 +291,13 @@ class Subtitle(wx.Panel):
 		ans.append(res);	
 		self.listBox.InsertItems(ans,num)
 			
+	def deleteitem(self,event):
+		num=self.listBox.GetSelection();
+		print num
+		dd=int(num)
+
+		self.listBox.Delete(dd);
+
 	def OpenFile(self,event):
 		file_wildcard = "All files(*.*)|*.*"
 		dlg = wx.FileDialog(self, "Open subtitle file...",
