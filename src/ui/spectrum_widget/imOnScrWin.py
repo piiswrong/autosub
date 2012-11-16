@@ -31,7 +31,7 @@ while handle.more_data():
                 iter = iter +1
                 #plt.imshow(np.log(p.T+1))
                 #plt.show()
-        vector = vector/np.amax(vector) * 255.0
+        vector = vector/np.amax(vector)
         vector = [vector, vector, vector]
         vector = np.dstack(vector)
         #plt.imsave(path, vector, cmap = cm.gray)
@@ -43,8 +43,6 @@ while handle.more_data():
                 specW = np.append(specW, vector, axis = 1)
                 list.append(vector)
         Num = Num + 1
-        
-
 
 
 class ImageWindow(wx.ScrolledWindow):
@@ -69,6 +67,7 @@ class ImageWindow(wx.ScrolledWindow):
         self.bitmap = bitmap
         #self.buffer = wx.EmptyBitmap(bitmap.GetWidth(), bitmap.GetHeight()+15)
         self.buffer = self.bitmap
+        self.SetScrollbars(1,0, self.bitmap.GetWidth(), 200)
         
         
     def OnPaint(self, event):
@@ -96,7 +95,6 @@ class ImageWindow(wx.ScrolledWindow):
                     width = self.LeX- self.RiX
                     x = self.RiX
                 height  = self.bitmap.GetHeight()
-                #rect = wx.Rect(x, 0, width, height)
                 pdc = wx.GCDC(dc)
                 pdc.SetBrush(brush)
                 pdc.DrawRectangle(x, 0, width, height)
@@ -111,9 +109,6 @@ class ImageWindow(wx.ScrolledWindow):
                 dc.DrawText(str(i), i, self.bitmap.GetHeight()+5)"""
         event.Skip()
             
-    def OnScroll(self, evt):
-        self.ScrollFlag = 1
-        evt.Skip()
 
     def OnMouseClick(self, event):
         #print event.GetLogicalPosition(self.cdc)
@@ -135,15 +130,15 @@ class Test_Frame(wx.Frame):
 
         wx.Frame.__init__(self, None, -1, 'spectrum widget')
         #self.orim = Image.fromarray(specW)
-        self.spec = specW
+        self.spec = specW*255.0
 
         panel = wx.Panel(self, -1)
         
         self.sld = wx.Slider(panel, value = 200, minValue = 150, maxValue =500,pos = (10,10),
                         size=(55, 150), style=wx.SL_VERTICAL | wx.SL_AUTOTICKS | wx.SL_LABELS)
         self.sld.SetTickFreq(20, 1)
-        self.sld1 = wx.Slider(panel, value = 200, minValue = 150, maxValue =500,pos = (70,10),
-                        size=(50, 150), style=wx.SL_VERTICAL| wx.SL_AUTOTICKS | wx.SL_LABELS )
+        self.sld1 = wx.Slider(panel, value = 200, minValue = 150, maxValue =500,pos = (60,10),
+                        size=(55, 150), style=wx.SL_VERTICAL| wx.SL_AUTOTICKS | wx.SL_LABELS )
         self.sld1.SetTickFreq(20, 1)
 
         self.Bind(wx.EVT_MENU, self.LeftButton, id=1)
@@ -163,22 +158,22 @@ class Test_Frame(wx.Frame):
         self.textright = wx.TextCtrl(panel, id=4, pos=(120, 100), size=(70, 25))
         
         
-        self.orim = wx.ImageFromBuffer(int(np.size(specW , axis = 1)), int(np.size(specW, axis = 0)), np.uint8(specW))
+        self.orim = wx.ImageFromBuffer(int(np.size(self.spec , axis = 1)), int(np.size(self.spec, axis = 0)), np.uint8(self.spec))
         self.im = self.orim
         self.bm = self.im.ConvertToBitmap()
 
         
         self.wind = ImageWindow(self)
-        self.wind.SetSize((300,150))
         self.wind.SetBitmap(self.im.ConvertToBitmap())
+        self.wind.SetScrollbars(1,0, self.im.GetWidth(), 200)
         wx.EVT_SLIDER(self.sld, self.sld.GetId(),self.sliderUpdate1)
         wx.EVT_SLIDER(self.sld1, self.sld1.GetId(),self.sliderUpdate2)
         #UPDATE THE TEXT ON LEFT CLICKING
-        self.wind.Bind(wx.EVT_LEFT_DOWN, self.LeftText)
-        self.wind.Bind(wx.EVT_RIGHT_DOWN, self.RightText)
+        self.wind.Bind(wx.EVT_LEFT_UP, self.LeftText)
+        self.wind.Bind(wx.EVT_RIGHT_UP, self.RightText)
         self.sld1.Bind(wx.EVT_SLIDER, self.sliderUpdate2)
         self.wind.FitInside()
-        self.wind.SetScrollbars(1,0, self.im.GetWidth(), 200)
+        #self.wind.SetScrollbars(1,0, self.im.GetWidth(), 200)
         
         
         sizer = wx.BoxSizer (wx.HORIZONTAL)
@@ -193,17 +188,16 @@ class Test_Frame(wx.Frame):
     def sliderUpdate1(self, event):
         self.pos = self.sld.GetValue()
         #str = "pos = %f" % (self.pos/150.0)
-        self.Refresh()
-        self.orim = wx.ImageFromBuffer(int(np.size(specW , axis = 1)), int(np.size(specW, axis = 0)), np.uint8(specW))
+        self.orim = wx.ImageFromBuffer(int(np.size(self.spec , axis = 1)), int(np.size(self.spec, axis = 0)), np.uint8(self.spec))
         NWID = round(self.bm.GetWidth() * self.pos/200.0)
         NHET = round(self.im.GetHeight())
         self.im = self.orim.Rescale(NWID ,NHET)
         self.wind.SetBitmap(self.im.ConvertToBitmap())
+        self.wind.Refresh()
 
     def sliderUpdate2(self, event):
         self.pos = self.sld1.GetValue()
-        ratio = self.pos/200
-        self.spec = self.spec * ratio
+        self.spec = specW*self.pos
         self.im = wx.ImageFromBuffer(int(np.size(self.spec, axis = 1)), int(np.size(self.spec, axis = 0)), np.uint8(self.spec))
         self.wind.SetBitmap(self.im.ConvertToBitmap())
         self.wind.Refresh()
