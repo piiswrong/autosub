@@ -8,10 +8,17 @@ import wx
 class MainFrame(vlc_wx.MyFrame):
     def __init__(self,title):
         fram=vlc_wx.MyFrame.__init__(self,title)
+        self.subtitle=None
+        self.ohandle=None
 
+
+        # variable
+        self.end=0
+
+        
     def OnOpen(self, evt):
         super(MainFrame, self).OnOpen(self)
-        lan={"English":"en" ,"Chinese":"zh-cn" ,"Janpanese":"ja"}
+        lan={"English":"en" ,"Chinese":"zh-cn" ,"Japanese":"ja"}
         lang_from = None
         lang_to = None
         source = None
@@ -39,11 +46,14 @@ class MainFrame(vlc_wx.MyFrame):
 
     def OnTimer(self,evt):
         super(MainFrame, self).OnTimer(self)
-        
         self.player.video_set_subtitle_file(None)
         self.player.video_set_subtitle_file(self.subtitle)
+        
         if self.ohandle.has_data(1):
-            (start,end,text)=self.ohandle.read(1)[2][0][0]
+            (start,self.end,text)=self.ohandle.read(1)[2][0][0]
+
+        # Set buffer time
+        self.buffergauge.SetValue(self.end*self.buffergauge.GetRange()*1000/self.player.get_length())
         
         # Link with subtitle
 

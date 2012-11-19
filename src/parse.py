@@ -5,6 +5,7 @@ from core.spectrum import spectrum
 from core.feature_extractor import feature_extractor
 import matplotlib.pyplot as plt
 import numpy as np
+import random
 
 SAMPLE_RATE = 8000
 N = 1
@@ -54,6 +55,8 @@ for sub_name, mov_name in zip(sub_names, mov_names):
     
     feat.join()
     
+random.shuffle(speech)
+random.shuffle(noise)
 for f in speech:
     plt.imshow(np.log(abs(f)**2).reshape((5, 128)))
     plt.show()

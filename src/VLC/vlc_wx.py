@@ -335,11 +335,6 @@ class MyFrame(wx.Frame):
                         str_length_sec=str(self.length_sec)
                 self.displaytime.SetLabel(str_min+":"+str_sec+"/"+str_length_min+":"+str_length_sec)
 
-                # update the buffertime
-                
-                # update the bufferslder
-                self.OnSetBuffer(None)
-                # update the subtitle
                 
 
         def OnToggleVolume(self, evt):
