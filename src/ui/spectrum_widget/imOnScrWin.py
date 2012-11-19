@@ -53,8 +53,7 @@ class ImageWindow(wx.ScrolledWindow):
         self.SetScrollRate(5,5)
         self.LeftClickFlag=0
         self.RightClickFlag=0
-        self.ScrollFlag=1
-        #self.Bind(wx.EVT_SCROLLWIN_THUMBTRACK, self.OnScroll
+        #self.Bind(wx.EVT_SCROLLWIN_THUMBTRACK, self.OnScroll)
         self.Bind(wx.EVT_PAINT, self.OnPaint)
         self.Bind(wx.EVT_LEFT_DOWN, self.OnMouseClick)
         self.Bind(wx.EVT_RIGHT_DOWN, self.OnRightClick)
@@ -98,6 +97,8 @@ class ImageWindow(wx.ScrolledWindow):
                 pdc = wx.GCDC(dc)
                 pdc.SetBrush(brush)
                 pdc.DrawRectangle(x, 0, width, height)
+        dc.SetPen(wx.Pen('white',1))
+        dc.DrawLine(-self.CalcScrolledPosition(0,0)[0] + 150, 0, -self.CalcScrolledPosition(0,0)[0] + 150, 150)
         del odc
         #SKIP THE DRAWING OF RULER WHICH SEVERELY STUCK THE RENDERING
         """dc.SetPen(wx.Pen('white',1))
@@ -124,8 +125,9 @@ class ImageWindow(wx.ScrolledWindow):
         self.RiX=event.X - self.CalcScrolledPosition(0,0)[0]
         self.Refresh()
         event.Skip()
+
             
-class Test_Frame(wx.Frame):
+class SpecFrame(wx.Frame):
     def __init__(self):
 
         wx.Frame.__init__(self, None, -1, 'spectrum widget')
@@ -156,6 +158,7 @@ class Test_Frame(wx.Frame):
         self.button2.Bind(wx.EVT_BUTTON, self.RightText)
         self.textleft = wx.TextCtrl(panel, id=3, pos=(120, 70), size=(70, 25))
         self.textright = wx.TextCtrl(panel, id=4, pos=(120, 100), size=(70, 25))
+        self.textmid = wx.TextCtrl(panel, id=5, pos=(120, 130), size=(70,25))
         
         
         self.orim = wx.ImageFromBuffer(int(np.size(self.spec , axis = 1)), int(np.size(self.spec, axis = 0)), np.uint8(self.spec))
@@ -171,6 +174,7 @@ class Test_Frame(wx.Frame):
         #UPDATE THE TEXT ON LEFT CLICKING
         self.wind.Bind(wx.EVT_LEFT_UP, self.LeftText)
         self.wind.Bind(wx.EVT_RIGHT_UP, self.RightText)
+        self.wind.Bind(wx.EVT_SCROLLWIN, self.MidText)
         self.sld1.Bind(wx.EVT_SLIDER, self.sliderUpdate2)
         self.wind.FitInside()
         #self.wind.SetScrollbars(1,0, self.im.GetWidth(), 200)
@@ -223,10 +227,15 @@ class Test_Frame(wx.Frame):
         if self.wind.RightClickFlag==1:
                 self.textright.WriteText(str(self.wind.RiX))
         event.Skip()
+
+    def MidText(self, event):
+        self.textmid.Clear()
+        self.textmid.WriteText(str(-self.wind.CalcScrolledPosition(0,0)[0] + 150))
+        event.Skip()
         
 if __name__=='__main__':
     app = wx.PySimpleApp()
-    f = Test_Frame()
+    f = SpecFrame()
     f.Show()
     app.MainLoop()
         
