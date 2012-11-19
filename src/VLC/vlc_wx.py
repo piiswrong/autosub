@@ -216,7 +216,7 @@ class MyFrame(wx.Frame):
 
                 # Set the Fast Key
                 acceltbl=wx.AcceleratorTable([(wx.ACCEL_CTRL,ord('O'),1),(wx.ACCEL_CTRL,ord('C'),2),(wx.ACCEL_CTRL,ord('P'),3),(wx.ACCEL_CTRL,ord('A'),4),(wx.ACCEL_CTRL,ord('S'),5),(wx.ACCEL_CTRL,ord('F'),6),(wx.ACCEL_CTRL,ord('V'),7)])
-                self.SetAcceleratorTable(acceltbl)  
+                self.SetAcceleratorTable(acceltbl)
 
         def OnExit(self, evt):
                 self.player.stop()

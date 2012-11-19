@@ -119,6 +119,8 @@ class Subtitle(wx.Panel):
 
 		# ctrlbar = wx.BoxSizer(wx.VERTICAL)
 		ctrlbox = wx.BoxSizer(wx.VERTICAL)
+
+		box1=wx.BoxSizer(wx.HORIZONTAL);
 		# box1 = wx.BoxSizer(wx.HORIZONTAL)
 		# box2 = wx.BoxSizer(wx.HORIZONTAL)
 		box3 = wx.BoxSizer(wx.HORIZONTAL)
@@ -137,6 +139,7 @@ class Subtitle(wx.Panel):
 		self.Bind(wx.EVT_BUTTON, self.SaveItem, save)
 		self.Bind(wx.EVT_BUTTON, self.Additem, add)
 		self.Bind(wx.EVT_BUTTON,self.deleteitem,delete)
+		
 		# box3.Add(stop,flag=wx.RIGHT,border=5)
 		# box3.Add((-1, -1), 1)
 		# box3.Add(fullscreen,flag=wx.RIGHT,border=5)
@@ -156,8 +159,7 @@ class Subtitle(wx.Panel):
 		# ctrlbox.Add(box2, flag=wx.EXPAND | wx.BOTTOM, border=5)
 
 		
-		self.begintext=wx.StaticText(self,-1,"Start time",(33,43));
-		self.endtext=wx.StaticText(self,-1,"End time",(183,43));
+		
 		# ctrlbar.Add(save, flag=wx.RIGHT, border=5)
 		# ctrlbar.Add(add,flag=wx.RIGHT,border=5)
 		# # ctrlbar.Add(stop,flag=wx.LEFT,border=5)
@@ -176,17 +178,23 @@ class Subtitle(wx.Panel):
 		# right.Add(subrow,flag=wx.EXPAND);
 		
 		# panel.SetSizer(right);
-		self.text=wx.StaticText(self,-1,"Content",(170,60))
+		leftedge=15;
+		self.begintext=wx.StaticText(self,-1,"Start time");
+		self.endtext=wx.StaticText(self,-1,"End time",(leftedge+200,43));
+
+		self.text=wx.StaticText(self,-1,"Content",(leftedge+150,70))
+
+
+		self.TextCtrl=wx.TextCtrl(self, pos=(leftedge, 90), size=(350, 50))
+		self.num=wx.TextCtrl(self,pos=(leftedge,43),size=(28,20))
 		
+		self.begintime=wx.TextCtrl(self,pos=(leftedge+90,43),size=(100,20))
+		self.endtime=wx.TextCtrl(self,pos=(leftedge+250,43),size=(100,20))
 
-		self.TextCtrl=wx.TextCtrl(self, pos=(3, 80), size=(350, 50))
-		self.num=wx.TextCtrl(self,pos=(3,43),size=(28,20))
-		self.begintime=wx.TextCtrl(self,pos=(80,43),size=(100,20))
-		self.endtime=wx.TextCtrl(self,pos=(230,43),size=(100,20))
+		samplelist=[''];
 
-		samplelist=['1 00:00','2 00:01'];
-		self.listBox=wx.ListBox(self,-1,(3,140),(350,100),samplelist,wx.LB_SINGLE)
-		self.listBox.SetSelection(1)
+		self.listBox=wx.ListBox(self,-1,(leftedge,200),(350,100),samplelist,wx.LB_SINGLE)
+		# self.listBox.SetSelection(1)
 
 		# menubar = wx.MenuBar()
 		# filem = wx.Menu()
