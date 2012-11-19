@@ -180,14 +180,15 @@ class MyFrame(wx.Frame):
 
 
                 BigSizer = wx.BoxSizer(wx.HORIZONTAL)
-
+                
                 sizer.Add(self.videopanel, 1, flag=wx.EXPAND)
                 sizer.Add(ctrlpanel, flag=wx.EXPAND | wx.BOTTOM | wx.TOP, border=10)
                 sizer.SetMinSize((400, 400))
                 subsizer=wx.BoxSizer(wx.VERTICAL);
                 subsizer.SetMinSize((400,400));
-                BigSizer.Add(sizer,flag=wx.EXPAND)
 
+                subpanel=Subtitle(self,-1);
+                subpanel.SetSizer(subsizer);
                 ####################################CUTTING LINE######################################
                 
                 splitter = wx.SplitterWindow(self, -1, style=wx.SP_LIVE_UPDATE)
@@ -195,10 +196,13 @@ class MyFrame(wx.Frame):
                 # subpanelf=wx.Panel(self,-1);
                 # BigSizer.Add(subpanelf,flag=wx.EXPAND|wx.RIGHT);
                 ####################################END Here##########################################
-                subpanel=Subtitle(self,-1);
-                subpanel.SetSizer(subsizer);
+                
+                BigSizer.Add(subpanel,flag=wx.EXPAND);
                 BigSizer.Add(splitter,flag=wx.EXPAND)
-                BigSizer.Add(subpanel,flag=wx.EXPAND|wx.RIGHT);
+                BigSizer.Add(sizer,flag=wx.EXPAND|wx.RIGHT)
+
+
+                
                 BigSizer.SetMinSize((900, 400))
 
                 self.SetSizer(BigSizer)
