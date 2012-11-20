@@ -180,12 +180,12 @@ class MyFrame(wx.Frame):
 
 
                 BigSizer = wx.BoxSizer(wx.HORIZONTAL)
-                
+
                 sizer.Add(self.videopanel, 1, flag=wx.EXPAND)
                 sizer.Add(ctrlpanel, flag=wx.EXPAND | wx.BOTTOM | wx.TOP, border=10)
-                sizer.SetMinSize((400, 400))
+                sizer.SetMinSize((400, 500))
                 subsizer=wx.BoxSizer(wx.VERTICAL);
-                subsizer.SetMinSize((400,400));
+                subsizer.SetMinSize((400,500));
 
                 subpanel=Subtitle(self,-1);
                 subpanel.SetSizer(subsizer);
@@ -203,10 +203,10 @@ class MyFrame(wx.Frame):
 
 
                 
-                BigSizer.SetMinSize((900, 400))
+                BigSizer.SetMinSize((900, 500))
 
                 self.SetSizer(BigSizer)
-                self.SetMinSize((900, 400))
+                self.SetMinSize((900, 500))
 
                 # finally create the timer, which updates the timeslider
                 self.timer = wx.Timer(self)

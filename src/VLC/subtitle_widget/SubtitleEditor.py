@@ -119,7 +119,7 @@ class Subtitle(wx.Panel):
         bback=(77,77,77);
 
         ctrlbar=wx.BoxSizer(wx.HORIZONTAL); 
-        bmp = wx.Image("button.bmp", wx.BITMAP_TYPE_BMP).ConvertToBitmap() 
+        # bmp = wx.Image("button.bmp", wx.BITMAP_TYPE_BMP).ConvertToBitmap() 
 
         save  = wx.Button(self, label="Save",pos=(15,340))
         save.SetFont(myfont)  
