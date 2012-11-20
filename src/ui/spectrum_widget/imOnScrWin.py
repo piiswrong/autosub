@@ -53,10 +53,14 @@ class ImageWindow(wx.ScrolledWindow):
         self.SetScrollRate(5,5)
         self.LeftClickFlag=0
         self.RightClickFlag=0
+        self.CurrPos=0
         #self.Bind(wx.EVT_SCROLLWIN_THUMBTRACK, self.OnScroll)
         self.Bind(wx.EVT_PAINT, self.OnPaint)
         self.Bind(wx.EVT_LEFT_DOWN, self.OnMouseClick)
         self.Bind(wx.EVT_RIGHT_DOWN, self.OnRightClick)
+        self.timer = wx.Timer(self)
+        self.timer.Start(1000)
+        self.Bind(wx.EVT_TIMER, self.OnTimer, self.timer)
         self.overlay=wx.Overlay()
         #ruler=RC.RulerCtrl(self, -1, pos=(0, np.size(specW, axis=0)), size=(np.size(specW , axis = 1),1),orient=wx.HORIZONTAL, style=wx.NO_BORDER)
         #ruler.SetFlip(flip=True)
@@ -99,6 +103,8 @@ class ImageWindow(wx.ScrolledWindow):
                 pdc.DrawRectangle(x, 0, width, height)
         dc.SetPen(wx.Pen('white',1))
         dc.DrawLine(-self.CalcScrolledPosition(0,0)[0] + 150, 0, -self.CalcScrolledPosition(0,0)[0] + 150, 150)
+        dc.SetPen(wx.Pen('green',1))
+        dc.DrawLine(self.CurrPos, 0, self.CurrPos, 150)
         del odc
         #SKIP THE DRAWING OF RULER WHICH SEVERELY STUCK THE RENDERING
         """dc.SetPen(wx.Pen('white',1))
@@ -123,6 +129,12 @@ class ImageWindow(wx.ScrolledWindow):
     def OnRightClick(self, event):
         self.RightClickFlag = 1
         self.RiX=event.X - self.CalcScrolledPosition(0,0)[0]
+        self.Refresh()
+        event.Skip()
+
+    def OnTimer(self, event):
+        self.CurrPos = self.CurrPos + 50
+        print self.CurrPos
         self.Refresh()
         event.Skip()
 
@@ -178,7 +190,7 @@ class SpecFrame(wx.Frame):
         self.sld1.Bind(wx.EVT_SLIDER, self.sliderUpdate2)
         self.wind.FitInside()
         #self.wind.SetScrollbars(1,0, self.im.GetWidth(), 200)
-        
+
         
         sizer = wx.BoxSizer (wx.HORIZONTAL)
         sizer.Add(self.wind, 1, wx.EXPAND, 0)
