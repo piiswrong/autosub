@@ -105,6 +105,8 @@ class ImageWindow(wx.ScrolledWindow):
         dc.DrawLine(-self.CalcScrolledPosition(0,0)[0] + 150, 0, -self.CalcScrolledPosition(0,0)[0] + 150, 150)
         dc.SetPen(wx.Pen('green',1))
         dc.DrawLine(self.CurrPos, 0, self.CurrPos, 150)
+        print -self.CalcScrolledPosition(0,0)[0]
+        print self.CurrPos
         del odc
         #SKIP THE DRAWING OF RULER WHICH SEVERELY STUCK THE RENDERING
         """dc.SetPen(wx.Pen('white',1))
@@ -134,7 +136,6 @@ class ImageWindow(wx.ScrolledWindow):
 
     def OnTimer(self, event):
         self.CurrPos = self.CurrPos + 50
-        print self.CurrPos
         self.Refresh()
         event.Skip()
 
@@ -162,16 +163,16 @@ class SpecFrame(wx.Frame):
         self.SetAcceleratorTable(acceltbl)
         
         #ADD TWO BUTTONS TO MANIPULATE THE LEFT AND RIGHT BORDER
-        self.button1 = wx.Button(panel, id=1, label='left', pos = (120,10), size = (70,25))
-        self.button2 = wx.Button(panel, id=2, label='right', pos=(120, 40), size = (70,25))
+        self.button1 = wx.Button(panel, id=1, label='left', pos = (120,5), size = (30,25))
+        self.button2 = wx.Button(panel, id=2, label='right', pos=(155,5), size = (30,25))
         self.button1.Bind(wx.EVT_BUTTON, self.LeftButton)
         self.button2.Bind(wx.EVT_BUTTON, self.RightButton)
         self.button1.Bind(wx.EVT_BUTTON, self.LeftText)
         self.button2.Bind(wx.EVT_BUTTON, self.RightText)
-        self.textleft = wx.TextCtrl(panel, id=3, pos=(120, 70), size=(70, 25))
-        self.textright = wx.TextCtrl(panel, id=4, pos=(120, 100), size=(70, 25))
-        self.textmid = wx.TextCtrl(panel, id=5, pos=(120, 130), size=(70,25))
-        
+        self.textleft = wx.TextCtrl(panel, id=3, pos=(120, 40), size=(70, 25))
+        self.textright = wx.TextCtrl(panel, id=4, pos=(120, 70), size=(70, 25))
+        self.textmid = wx.TextCtrl(panel, id=5, pos=(120, 100), size=(70,25))
+        self.textcurr = wx.TextCtrl(panel, id=6, pos=(120, 130), size=(70,25))
         
         self.orim = wx.ImageFromBuffer(int(np.size(self.spec , axis = 1)), int(np.size(self.spec, axis = 0)), np.uint8(self.spec))
         self.im = self.orim
@@ -188,6 +189,7 @@ class SpecFrame(wx.Frame):
         self.wind.Bind(wx.EVT_RIGHT_UP, self.RightText)
         self.wind.Bind(wx.EVT_SCROLLWIN, self.MidText)
         self.sld1.Bind(wx.EVT_SLIDER, self.sliderUpdate2)
+        self.wind.Bind(wx.EVT_TIMER, self.CurrText, self.wind.timer)
         self.wind.FitInside()
         #self.wind.SetScrollbars(1,0, self.im.GetWidth(), 200)
 
@@ -243,6 +245,11 @@ class SpecFrame(wx.Frame):
     def MidText(self, event):
         self.textmid.Clear()
         self.textmid.WriteText(str(-self.wind.CalcScrolledPosition(0,0)[0] + 150))
+        event.Skip()
+
+    def CurrText(self, event):
+        self.textcurr.Clear()
+        self.textcurr.WriteText(str(self.wind.CurrPos+50))
         event.Skip()
         
 if __name__=='__main__':
