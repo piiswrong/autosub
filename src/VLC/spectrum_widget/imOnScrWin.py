@@ -10,8 +10,8 @@ import wx.lib.agw.rulerctrl as RC
 import matplotlib.cm as cm
 import wx
 
-dec = fd.ffmpeg_decoder('../data/demo.mp4')
-spec = sp.spectrum(dec.ostream.get_handle())
+dec = fd.ffmpeg_decoder('../data/demo.mp4', output_rate = 8000)
+spec = sp.spectrum(dec.ostream.get_handle(), window_size = 1024)
 handle = spec.ostream.get_handle()
 
 dec.start()
