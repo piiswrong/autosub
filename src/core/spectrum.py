@@ -4,8 +4,8 @@ import numpy as np
 from common import constants
 
 class spectrum(processor_np):
-    def __init__(self, istream_handle, squared = True):
-        self.window_size = 256
+    def __init__(self, istream_handle, squared = True, window_size = 256):
+        self.window_size = window_size
         self.shift_dist = 128
         self.batch_size = 100
         self.squared = squared
