@@ -117,28 +117,28 @@ class Subtitle(wx.Panel):
         Backgroud=(57,59,66);
         Fontcolor=(229,229,229);
         ctrlbar=wx.BoxSizer(wx.HORIZONTAL); 
-        save  = pbtn.PlateButton(self, label="Save",pos=(10,10))
-        add   = pbtn.PlateButton(self, label="Add",pos=(50,10))
-        delete = pbtn.PlateButton(self,label="Delete",pos=(90,10))
-
+        save  = pbtn.PlateButton(self, label="Save",pos=(10,340))
+        add   = pbtn.PlateButton(self, label="Add",pos=(50,340))
+        delete = pbtn.PlateButton(self,label="Delete",pos=(90,340))
+        readfile=pbtn.PlateButton(self,label="Read",pos=(150,340))
+        writefile=pbtn.PlateButton(self,label="Write",pos=(190,340))
 
 
         # ctrlbar = wx.BoxSizer(wx.VERTICAL)
         ctrlbox = wx.BoxSizer(wx.VERTICAL)
 
         box1=wx.BoxSizer(wx.HORIZONTAL);
-        box1 = wx.BoxSizer(wx.HORIZONTAL)
-        box2 = wx.BoxSizer(wx.HORIZONTAL)
+        # box1 = wx.BoxSizer(wx.HORIZONTAL)
+        # box2 = wx.BoxSizer(wx.HORIZONTAL)
         box3 = wx.BoxSizer(wx.HORIZONTAL)
-        box4 = wx.BoxSizer(wx.HORIZONTAL)
-        box5 = wx.BoxSizer(wx.HORIZONTAL)
+        # box4 = wx.BoxSizer(wx.HORIZONTAL)
+        # box5 = wx.BoxSizer(wx.HORIZONTAL)
         # box1 contains the timeslider
      
         # box1.Add(self.timeslider,1)
         # # box2 contains the bufferslider
         # box2.Add(self.buffergauge,1)
         # box3 contains some buttons and the volume controls
-
         box3.Add(save, flag=wx.RIGHT, border=5)
         box3.Add(add,flag=wx.RIGHT,border=5)
         box3.Add(delete,flag=wx.RIGHT,border=5)
@@ -146,6 +146,9 @@ class Subtitle(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.SaveItem, save)
         self.Bind(wx.EVT_BUTTON, self.Additem, add)
         self.Bind(wx.EVT_BUTTON,self.deleteitem,delete)
+                # self.Bind(wx.EVT_BUTTON, self.SaveItem, save)
+        self.Bind(wx.EVT_BUTTON, self.OpenFile, readfile)
+        self.Bind(wx.EVT_BUTTON,self.SaveFile,writefile)
 
         # box3.Add(stop,flag=wx.RIGHT,border=5)
         # box3.Add((-1, -1), 1)
@@ -188,19 +191,31 @@ class Subtitle(wx.Panel):
         
         textbox=wx.TextAttr(Fontcolor,Backgroud);
         leftedge=15;
-        self.begintext=wx.StaticText(self,-1,"Start time");
+        self.begintext=wx.StaticText(self,-1,"Start Time:",(leftedge,15));
         self.begintext.SetFont(myfont);
         self.begintext.SetForegroundColour(Fontcolor); 
         # self.begintext.SetDefaultStyle(textbox);
-        self.endtext=wx.StaticText(self,-1,"End time");
+
+        self.begintime=wx.TextCtrl(self,pos=(leftedge,50),size=(100,25),style=wx.TE_RICH2)
+        self.begintime.SetBackgroundColour((57,59,66));
+        self.begintime.SetFont(myfont);
+        self.begintime.SetForegroundColour(Fontcolor); 
+
+        self.endtext=wx.StaticText(self,-1,"End Time:",(leftedge,75));
         self.endtext.SetFont(myfont);
         self.endtext.SetForegroundColour(Fontcolor); 
-       
-        self.text=wx.StaticText(self,-1,"Content")
+
+
+        self.endtime=wx.TextCtrl(self,pos=(leftedge,100),size=(100,25),style=wx.TE_RICH2)
+        self.endtime.SetBackgroundColour((57,59,66));
+        self.endtime.SetFont(myfont);
+        self.endtime.SetForegroundColour(Fontcolor); 
+
+        self.text=wx.StaticText(self,-1,"Content",(leftedge,125))
         self.text.SetFont(myfont);
         self.text.SetForegroundColour(Fontcolor); 
 
-        self.TextCtrl=wx.TextCtrl(self, size=(350, 50),style=wx.TE_RICH2)
+        self.TextCtrl=wx.TextCtrl(self, pos=(leftedge, 150), size=(350, 50),style=wx.TE_RICH2)
         self.TextCtrl.SetBackgroundColour((57,59,66));
 
         # self.TextCtrl.SetStyle(44, 52, wx.TextAttr("white", "black"))
@@ -208,26 +223,13 @@ class Subtitle(wx.Panel):
         self.TextCtrl.SetFont(myfont);
         self.TextCtrl.SetForegroundColour(Fontcolor); 
 
+        # self.num=wx.TextCtrl(self,pos=(leftedge,43),size=(28,20))
         
 
-        self.begintime=wx.TextCtrl(self,size=(100,25),style=wx.TE_RICH2)
-        self.begintime.SetBackgroundColour((57,59,66));
-        self.begintime.SetFont(myfont);
-        self.begintime.SetForegroundColour(Fontcolor); 
-
-        self.endtime=wx.TextCtrl(self,size=(100,25),style=wx.TE_RICH2)
-        self.endtime.SetBackgroundColour((57,59,66));
-        self.endtime.SetFont(myfont);
-        self.endtime.SetForegroundColour(Fontcolor); 
-
-        box1.Add(self.begintext,1)
-        box2.Add(self.begintime,1)
-        box4.Add(self.endtext,1)
-        box5.Add(self.endtime,1)
 
         samplelist=[''];
 
-        self.listBox=wx.ListBox(self,-1,(leftedge,200),(350,100),samplelist,wx.LB_SINGLE)
+        self.listBox=wx.ListBox(self,-1,(leftedge,225),(350,100),samplelist,wx.LB_SINGLE)
         # self.listBox.SetSelection(1)
 
         # menubar = wx.MenuBar()
@@ -252,12 +254,8 @@ class Subtitle(wx.Panel):
         self.listBox.SetBackgroundColour(Backgroud)
         self.listBox.SetFont(myfont)
         self.listBox.SetForegroundColour(Fontcolor)
-
-        ctrlbox.Add(box1, flag=wx.EXPAND , border=0)
-        ctrlbox.Add(box2, flag=wx.EXPAND , border=0)
-        ctrlbox.Add(box4, flag=wx.EXPAND , border=0)
-        ctrlbox.Add(box5, flag=wx.EXPAND , border=5)
-        ctrlbox.Add(box3, flag=wx.EXPAND , border=5)    
+        ctrlbox.Add(box3, 1, wx.EXPAND)
+        
         # Put everything togheter
         self.sizer = wx.BoxSizer(wx.VERTICAL)
 
@@ -281,7 +279,7 @@ class Subtitle(wx.Panel):
         content=self.listBox.GetString(index)
         tmp=content.split(' ')
 
-        self.num.SetValue(tmp[0])
+        # self.num.SetValue(tmp[0])
         if(len(tmp)>1):
             self.begintime.SetValue(tmp[1])
         if(len(tmp)>3):
@@ -307,9 +305,9 @@ class Subtitle(wx.Panel):
         for i in range(0,num):
             tmp=self.listBox.GetString(i);
             item=tmp.split(' ');
-            f.write(item[0]+'\n');
+            f.write(str(i+1)+'\n');
             if(len(item)>3):
-                f.write(item[1]+' '+item[2]+' '+item[3]+'\n')
+                f.write(item[1]+' '+item[2]+'> '+item[3]+'\n')
             ct=0
             subti=""
             for i in item:
@@ -323,19 +321,21 @@ class Subtitle(wx.Panel):
             f.write(csub+'\n'+'\n');
         f.close()
     def SaveItem(self,event):
-        num=self.num.GetValue();
+        # num=self.num.GetValue();
         time=self.begintime.GetValue()+' -- '+self.endtime.GetValue()
         text=self.TextCtrl.GetValue();
-        res=num+' '+time+' '+text;
+        res=' '+time+' '+text;
         num=self.listBox.GetSelection() 
         self.listBox.SetString(num,res)
 
     def Additem(self,event):
-        num=self.num.GetValue();
+        # num=self.num.GetValue();
         time=self.begintime.GetValue()+' -- '+self.endtime.GetValue()
         text=self.TextCtrl.GetValue();
-        res=num+' '+time+' '+text;
+        res=' '+time+' '+text;
         num=self.listBox.GetSelection() 
+        if(num==-1):
+            num=0;
         ans=[];
         ans.append(res);    
         self.listBox.InsertItems(ans,num)
@@ -366,7 +366,7 @@ class Subtitle(wx.Panel):
             li=AssParser(foot);
         self.listBox.Clear()
         for i in li:
-            srt=str(i[0])+' '+i[1]+' -- '+i[2]+' '+i[3];
+            srt=' '+i[1]+' -- '+i[2]+' '+i[3];
             ad=srt.decode('utf-8','ignore');
             self.listBox.Append(ad);
             # print ad;

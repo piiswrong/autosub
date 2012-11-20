@@ -1,7 +1,7 @@
 #coding = utf-8 
 import re
 # import chardet
-import codecs
+# import codecs
 # def AssParser(url):
 # 	myf=open(url,'r');
 
@@ -15,7 +15,7 @@ def AssParser(url):
 	myf=open(url,'r');
 	# print myf.read();
 	cont=myf.read();
-	dec=GetTheEncoding(cont)
+	# dec=GetTheEncoding(cont)
 	p=re.compile("Dialogue: [^\n]*");
 	j=p.findall(cont);
 	li=[];
@@ -39,7 +39,7 @@ def SrtParser(url):
 	myf=open(url,'r');
 	# print myf.read();
 	cont=myf.read()
-	dec=GetTheEncoding(cont)
+	# dec=GetTheEncoding(cont)
 	allitem=cont.split('\n')
 	li=[];
 	ct=0;
