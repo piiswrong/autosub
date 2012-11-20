@@ -116,13 +116,35 @@ class Subtitle(wx.Panel):
               False, u'Segoe UI');
         Backgroud=(57,59,66);
         Fontcolor=(229,229,229);
-        ctrlbar=wx.BoxSizer(wx.HORIZONTAL); 
-        save  = pbtn.PlateButton(self, label="Save",pos=(10,340))
-        add   = pbtn.PlateButton(self, label="Add",pos=(50,340))
-        delete = pbtn.PlateButton(self,label="Delete",pos=(90,340))
-        readfile=pbtn.PlateButton(self,label="Read",pos=(150,340))
-        writefile=pbtn.PlateButton(self,label="Write",pos=(190,340))
+        bback=(77,77,77);
 
+        ctrlbar=wx.BoxSizer(wx.HORIZONTAL); 
+        bmp = wx.Image("button.bmp", wx.BITMAP_TYPE_BMP).ConvertToBitmap() 
+
+        save  = wx.Button(self, label="Save",pos=(15,340))
+        save.SetFont(myfont)  
+        save.SetBackgroundColour(bback)  
+        save.SetForegroundColour(Fontcolor)  
+
+        add   = wx.Button(self, label="Add",pos=(115,340))
+        add.SetFont(myfont)   
+        add.SetBackgroundColour(bback)  
+        add.SetForegroundColour(Fontcolor)  
+
+        delete = wx.Button(self,label="Delete",pos=(225,340))
+        delete.SetFont(myfont)   
+        delete.SetBackgroundColour(bback)  
+        delete.SetForegroundColour(Fontcolor)  
+
+        readfile=wx.Button(self,label="Read",pos=(120,15))
+        readfile.SetFont(myfont)   
+        readfile.SetBackgroundColour(bback)  
+        readfile.SetForegroundColour(Fontcolor)  
+
+        writefile=wx.Button(self,label="Write",pos=(200,15))
+        writefile.SetFont(myfont)   
+        writefile.SetBackgroundColour(bback)  
+        writefile.SetForegroundColour(Fontcolor)  
 
         # ctrlbar = wx.BoxSizer(wx.VERTICAL)
         ctrlbox = wx.BoxSizer(wx.VERTICAL)
@@ -196,7 +218,7 @@ class Subtitle(wx.Panel):
         self.begintext.SetForegroundColour(Fontcolor); 
         # self.begintext.SetDefaultStyle(textbox);
 
-        self.begintime=wx.TextCtrl(self,pos=(leftedge,50),size=(100,25),style=wx.TE_RICH2)
+        self.begintime=wx.TextCtrl(self,pos=(leftedge,50),size=(350,25),style=wx.TE_RICH2)
         self.begintime.SetBackgroundColour((57,59,66));
         self.begintime.SetFont(myfont);
         self.begintime.SetForegroundColour(Fontcolor); 
@@ -206,7 +228,7 @@ class Subtitle(wx.Panel):
         self.endtext.SetForegroundColour(Fontcolor); 
 
 
-        self.endtime=wx.TextCtrl(self,pos=(leftedge,100),size=(100,25),style=wx.TE_RICH2)
+        self.endtime=wx.TextCtrl(self,pos=(leftedge,100),size=(350,25),style=wx.TE_RICH2)
         self.endtime.SetBackgroundColour((57,59,66));
         self.endtime.SetFont(myfont);
         self.endtime.SetForegroundColour(Fontcolor); 
