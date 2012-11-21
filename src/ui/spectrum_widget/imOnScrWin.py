@@ -175,7 +175,7 @@ class SpecFrame(wx.Frame):
         self.textcurr = wx.TextCtrl(panel, id=6, pos=(120, 130), size=(70,25))
         
         self.orim = wx.ImageFromBuffer(int(np.size(self.spec , axis = 1)), int(np.size(self.spec, axis = 0)), np.uint8(self.spec))
-        self.orim = self.orim.Rescale(self.orim.GetWidth(), 120)
+        self.orim = self.orim.Rescale(self.orim.GetWidth(), 140)
         self.im = self.orim
         self.bm = self.im.ConvertToBitmap()
 
@@ -216,10 +216,13 @@ class SpecFrame(wx.Frame):
 
     def sliderUpdate2(self, event):
         self.pos = self.sld1.GetValue()
+        self.wind.Refresh()
+        self.wind.overlay.Reset()
         self.spec = specW*self.pos
         self.im = wx.ImageFromBuffer(int(np.size(self.spec, axis = 1)), int(np.size(self.spec, axis = 0)), np.uint8(self.spec))
+        self.im=self.im.Rescale(self.im.GetWidth(), 140)
         self.wind.SetBitmap(self.im.ConvertToBitmap())
-        self.wind.Refresh()
+
 
     def LeftButton(self, event):
         self.wind.LeX = self.wind.LeX -1
