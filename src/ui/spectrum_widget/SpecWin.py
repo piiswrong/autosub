@@ -117,9 +117,9 @@ class SpecPanel(wx.Panel):
     def __init__(self,parent):
 
         wx.Panel.__init__(self,parent,-1)
-        specW=self.OpenData(self)
+        self.specW=self.OpenData(self)
         #self.orim = Image.fromarray(specW)
-        self.spec = specW*255.0
+        self.spec = self.specW*255.0
 
         panel = wx.Panel(self, -1)
         self.ratio = 15.69565217391304
@@ -237,7 +237,7 @@ class SpecPanel(wx.Panel):
         self.pos = self.sld1.GetValue()
         self.wind.Refresh()
         self.wind.overlay.Reset()
-        self.spec = specW*self.pos
+        self.spec = self.specW*self.pos
         self.im = wx.ImageFromBuffer(int(np.size(self.spec, axis = 1)), int(np.size(self.spec, axis = 0)), np.uint8(self.spec))
         self.im=self.im.Rescale(self.im.GetWidth(), 140)
         self.wind.SetBitmap(self.im.ConvertToBitmap())
