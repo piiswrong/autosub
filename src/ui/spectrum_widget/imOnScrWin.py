@@ -139,11 +139,16 @@ class ImageWindow(wx.ScrolledWindow):
         self.Refresh()
         event.Skip()
 
-            
-class SpecFrame(wx.Frame):
-    def __init__(self):
+"""class SimFrame(wx.Frame):
+        def __init__(self):
+                wx.Frame.__init__(self,None,-1,"Frame")
+                self.panel=SpecPanel(self)"""
 
-        wx.Frame.__init__(self, None, -1, 'spectrum widget')
+            
+class SpecPanel(wx.Panel):
+    def __init__(self,parent):
+
+        wx.Panel.__init__(self,parent,-1)
         #self.orim = Image.fromarray(specW)
         self.spec = specW*255.0
 
@@ -257,9 +262,9 @@ class SpecFrame(wx.Frame):
         self.textcurr.WriteText(str(int((self.wind.CurrPos+50)/self.ratio/60))+":"+str(int((self.wind.CurrPos+50)/self.ratio%60)))
         event.Skip()
         
-if __name__=='__main__':
+"""if __name__=='__main__':
     app = wx.PySimpleApp()
-    f = SpecFrame()
+    f = SimFrame()
     f.Show()
-    app.MainLoop()
+    app.MainLoop()"""
         
