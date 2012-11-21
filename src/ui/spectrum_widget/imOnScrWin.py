@@ -6,43 +6,9 @@ import core.ffmpeg_decoder as fd
 import core.spectrum as sp
 import matplotlib.pyplot as plt
 import numpy as np
-
+import os
 import matplotlib.cm as cm
 
-dec = fd.ffmpeg_decoder('../data/demo.mp4', output_rate = 8000)
-spec = sp.spectrum(dec.ostream.get_handle(), window_size = 1024)
-handle = spec.ostream.get_handle()
-
-dec.start()
-spec.start()
-Num = 0
-
-while handle.more_data():
-        iter = 0
-        q = []
-        pos, n, q = handle.read(1000, q)
-        for p in q:
-                if iter == 0:
-                        temp = p.T[::-1]
-                        vector = np.log(temp + 1)
-                else:
-                        temp = p.T[::-1]
-                        vector = np.append(vector, np.log(temp + 1), axis =1)
-                iter = iter +1
-                #plt.imshow(np.log(p.T+1))
-                #plt.show()
-        vector = vector/np.amax(vector)
-        vector = [vector, vector, vector]
-        vector = np.dstack(vector)
-        #plt.imsave(path, vector, cmap = cm.gray)
-        im = wx.ImageFromBuffer(int(np.size(vector, axis = 1)), int(np.size(vector, axis = 0)), np.uint8(vector))
-        if Num == 0:
-                specW = vector
-                list = [vector]
-        else:
-                specW = np.append(specW, vector, axis = 1)
-                list.append(vector)
-        Num = Num + 1
 
 
 class ImageWindow(wx.ScrolledWindow):
@@ -119,6 +85,7 @@ class ImageWindow(wx.ScrolledWindow):
         event.Skip()
             
 
+
     def OnMouseClick(self, event):
         #print event.GetLogicalPosition(self.cdc)
         self.LeftClickFlag = 1
@@ -150,6 +117,7 @@ class SpecPanel(wx.Panel):
     def __init__(self,parent):
 
         wx.Panel.__init__(self,parent,-1)
+        specW=self.OpenData(self)
         #self.orim = Image.fromarray(specW)
         self.spec = specW*255.0
 
@@ -210,7 +178,51 @@ class SpecPanel(wx.Panel):
         self.SetSizer(sizer)
         self.SetSize((500,200))
         #self.Fit()
-        
+    def OpenData(self,event):
+        file_wildcard = "All files(*.*)|*.*"
+        dlg = wx.FileDialog(self, "Open subtitle file...",
+                            os.getcwd(), 
+                            style = wx.OPEN,
+                            wildcard = file_wildcard)
+        if(dlg.ShowModal() == wx.ID_OK):
+            self.addr=dlg.GetPath()
+        # print self.addr
+        ad="D:\\GitHub\\RL\\test.mp4"
+        dec = fd.ffmpeg_decoder(self.addr, output_rate = 8000)
+        spec = sp.spectrum(dec.ostream.get_handle(), window_size = 1024)
+        handle = spec.ostream.get_handle()
+
+        dec.start()
+        spec.start()
+        Num = 0
+
+        while handle.more_data():
+                iter = 0
+                q = []
+                pos, n, q = handle.read(1000, q)
+                for p in q:
+                        if iter == 0:
+                                temp = p.T[::-1]
+                                vector = np.log(temp + 1)
+                        else:
+                                temp = p.T[::-1]
+                                vector = np.append(vector, np.log(temp + 1), axis =1)
+                        iter = iter +1
+                        #plt.imshow(np.log(p.T+1))
+                        #plt.show()
+                vector = vector/np.amax(vector)
+                vector = [vector, vector, vector]
+                vector = np.dstack(vector)
+                #plt.imsave(path, vector, cmap = cm.gray)
+                im = wx.ImageFromBuffer(int(np.size(vector, axis = 1)), int(np.size(vector, axis = 0)), np.uint8(vector))
+                if Num == 0:
+                        specW = vector
+                        list = [vector]
+                else:
+                        specW = np.append(specW, vector, axis = 1)
+                        list.append(vector)
+                Num = Num + 1
+        return specW
     def sliderUpdate1(self, event):
         self.pos = self.sld.GetValue()
         self.wind.overlay.Reset()
