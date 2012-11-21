@@ -19,7 +19,7 @@ class MyFrame(wx.Frame):
                 #Menu Bar
                 self.frame_menubar=wx.MenuBar()
                 #  File Menu
-                self.icon=wx.Icon('./VLC/autosub.ico',wx.wx.BITMAP_TYPE_ICO);
+                self.icon=wx.Icon('./VLC/Icons/autosub.ico',wx.wx.BITMAP_TYPE_ICO);
                 self.SetIcon(self.icon);
                 self.file_menu=wx.Menu()
                 self.file_menu.Append(1,"&Open \tCtrl+O")
@@ -88,6 +88,14 @@ class MyFrame(wx.Frame):
 
 
                 self.SetMenuBar(self.frame_menubar)
+
+
+                # common background attributes
+                myfont=wx.Font(11, wx.SWISS, wx.NORMAL, wx.NORMAL,False, u'Segoe UI')
+                Backgroud=(57,59,66)
+                Fontcolor=(229,229,229)
+                bback=(77,77,77);
+                self.SetBackgroundColour(Backgroud)
  
                 #Panels
                 # This is the subtitlepanel
@@ -98,30 +106,56 @@ class MyFrame(wx.Frame):
 
                 # The second panel holds controls
                 ctrlpanel = wx.Panel(self, -1 )
+
+                #  timeslider
                 self.timeslider = wx.Slider(ctrlpanel, -1, 0, 0, 1000,size=(500,20)) #timeline
                 self.timeslider.SetRange(0, 1000)
+                self.timeslider.SetBackgroundColour(Backgroud)
+                #  buffergauge
                 self.buffergauge = wx.Gauge(ctrlpanel, -1,1000,size=(500,10)) 
                 self.buffergauge.SetRange(1000)
-                                                                          
+                self.buffergauge.SetBackgroundColour(Backgroud)
+                #  display time                                                                          
                 self.displaytime=wx.StaticText(ctrlpanel, -1, "00:00/00:00", size=(10,15))
+                self.displaytime.SetBackgroundColour(Backgroud)
+                #  buffer time
                 self.buffertime=wx.StaticText(ctrlpanel, -1, "00:00/00:00", size=(10,15))
-                
+                self.buffertime.SetBackgroundColour(Backgroud)
+
+                #  pause button
                 pause  = pbtn.PlateButton(ctrlpanel, label="Pause")
-                play   = pbtn.PlateButton(ctrlpanel, label="Play")
+                pause.SetBackgroundColour(Backgroud)
+                #  play button
+                play   = pbtn.PlateButton(ctrlpanel)
+                play.SetBackgroundColour(Backgroud)
+                playbmp=wx.Bitmap("./VLC/Icons/play.png",wx.BITMAP_TYPE_PNG)
+                playbmp.SetSize(size=(30,30))
+                play.SetBitmap(bmp=playbmp)
+                #  stop button
                 stop   = pbtn.PlateButton(ctrlpanel, label="Stop")
-                volume = pbtn.PlateButton(ctrlpanel, label="Volume")        
-                fullscreen = pbtn.PlateButton(ctrlpanel, label="FullScreen")
+                stop.SetBackgroundColour(Backgroud)
+                #  volume button
+                self.volume = pbtn.PlateButton(ctrlpanel)
+                self.volume.SetBackgroundColour(Backgroud)
+                volumebmp=wx.Bitmap("./VLC/Icons/volume.png",wx.BITMAP_TYPE_PNG)
+                self.volume.SetSize((15,15))
+                self.volume.SetBitmap(bmp=volumebmp)
+                #  fullscreen button
+                fullscreen = pbtn.PlateButton(ctrlpanel)
+                fullscreen.SetBackgroundColour(Backgroud)
+                fullscreenbmp=wx.Bitmap("./VLC/Icons/fullscreen.png", wx.BITMAP_TYPE_PNG)
+                fullscreen.SetSize(size=(20,20))
+                fullscreen.SetBitmap(bmp=fullscreenbmp)
+                #  voice slider
                 self.volslider = wx.Slider(ctrlpanel, -1, 0, 0, 100, size=(100, -1))
+                self.volslider.SetBackgroundColour(Backgroud)
 
-                self.feedback=pbtn.PlateButton(ctrlpanel,label="Feedback")
-
-
-                # Add the picture to the button
-                feedbackbmp=wx.Bitmap("./VLC/smile.gif",wx.BITMAP_TYPE_GIF)
+                #  feedback button
+                self.feedback=pbtn.PlateButton(ctrlpanel)
+                self.feedback.SetBackgroundColour(Backgroud)
+                feedbackbmp=wx.Bitmap("./VLC/Icons/smile.gif",wx.BITMAP_TYPE_GIF)
                 feedbackbmp.SetSize(size=(15,15))
-                self.feedback.SetBitmap(bmp=feedbackbmp)
-
-
+                self.feedback.SetBitmap(bmp=feedbackbmp) 
                 
                 ''' this is the Subtitle Editor'''
                 # pos=wx.Frame.GetPosition();
@@ -131,7 +165,7 @@ class MyFrame(wx.Frame):
                 self.Bind(wx.EVT_BUTTON, self.OnPlay, play)
                 self.Bind(wx.EVT_BUTTON, self.OnPause, pause)
                 self.Bind(wx.EVT_BUTTON, self.OnStop, stop)
-                self.Bind(wx.EVT_BUTTON, self.OnToggleVolume, volume)
+                self.Bind(wx.EVT_BUTTON, self.OnToggleVolume, self.volume)
                 self.Bind(wx.EVT_SLIDER, self.OnSetVolume, self.volslider)
                 self.Bind(wx.EVT_SLIDER, self.OnSetPlayTime, self.timeslider)
                 self.Bind(wx.EVT_BUTTON, self.OnToggleFullScreen, fullscreen)
@@ -156,7 +190,7 @@ class MyFrame(wx.Frame):
                 box3.Add((-1, -1), 1)
                 box3.Add(self.feedback,flag=wx.RIGHT,border=3)
                 box3.Add(fullscreen,flag=wx.RIGHT,border=5)
-                box3.Add(volume,flag=wx.RIGHT,border=5)
+                box3.Add(self.volume,flag=wx.RIGHT,border=5)
                 box3.Add(self.volslider, flag=wx.TOP | wx.LEFT, border=5)
 
                 # box4 contains the playtime
@@ -180,12 +214,12 @@ class MyFrame(wx.Frame):
 
 
                 BigSizer = wx.BoxSizer(wx.HORIZONTAL)
-
+                
                 sizer.Add(self.videopanel, 1, flag=wx.EXPAND)
                 sizer.Add(ctrlpanel, flag=wx.EXPAND | wx.BOTTOM | wx.TOP, border=10)
-                sizer.SetMinSize((400, 500))
+                sizer.SetMinSize((400, 400))
                 subsizer=wx.BoxSizer(wx.VERTICAL);
-                subsizer.SetMinSize((400,500));
+                subsizer.SetMinSize((400,400));
 
                 subpanel=Subtitle(self,-1);
                 subpanel.SetSizer(subsizer);
@@ -203,10 +237,10 @@ class MyFrame(wx.Frame):
 
 
                 
-                BigSizer.SetMinSize((900, 500))
+                BigSizer.SetMinSize((900, 400))
 
                 self.SetSizer(BigSizer)
-                self.SetMinSize((900, 500))
+                self.SetMinSize((900, 400))
 
                 # finally create the timer, which updates the timeslider
                 self.timer = wx.Timer(self)
