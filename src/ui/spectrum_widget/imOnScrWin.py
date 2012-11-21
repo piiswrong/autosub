@@ -139,21 +139,28 @@ class ImageWindow(wx.ScrolledWindow):
         self.Refresh()
         event.Skip()
 
-            
-class SpecFrame(wx.Frame):
-    def __init__(self):
+class SimFrame(wx.Frame):
+        def __init__(self):
+                wx.Frame.__init__(self,None,-1,"Frame")
+                self.panel=SpecPanel(self)
+                self.SetSize((500,200))
 
-        wx.Frame.__init__(self, None, -1, 'spectrum widget')
+            
+class SpecPanel(wx.Panel):
+    def __init__(self,parent):
+
+        wx.Panel.__init__(self,parent,-1)
         #self.orim = Image.fromarray(specW)
         self.spec = specW*255.0
 
         panel = wx.Panel(self, -1)
+        self.ratio = 15.69565217391304
         
         self.sld = wx.Slider(panel, value = 200, minValue = 150, maxValue =500,pos = (10,10),
-                        size=(55, 150), style=wx.SL_VERTICAL | wx.SL_AUTOTICKS | wx.SL_LABELS)
+                        size=(55, 150), style=wx.SL_VERTICAL | wx.SL_AUTOTICKS | wx.SL_LABELS, name='width')
         self.sld.SetTickFreq(20, 1)
         self.sld1 = wx.Slider(panel, value = 200, minValue = 150, maxValue =500,pos = (60,10),
-                        size=(55, 150), style=wx.SL_VERTICAL| wx.SL_AUTOTICKS | wx.SL_LABELS )
+                        size=(55, 150), style=wx.SL_VERTICAL| wx.SL_AUTOTICKS | wx.SL_LABELS)
         self.sld1.SetTickFreq(20, 1)
 
         self.Bind(wx.EVT_MENU, self.LeftButton, id=1)
@@ -163,16 +170,16 @@ class SpecFrame(wx.Frame):
         self.SetAcceleratorTable(acceltbl)
         
         #ADD TWO BUTTONS TO MANIPULATE THE LEFT AND RIGHT BORDER
-        self.button1 = wx.Button(panel, id=1, label='left', pos = (120,5), size = (30,25))
-        self.button2 = wx.Button(panel, id=2, label='right', pos=(155,5), size = (30,25))
+        self.button1 = wx.Button(panel, id=1, label='left', pos = (115,5), size = (30,25))
+        self.button2 = wx.Button(panel, id=2, label='right', pos=(150,5), size = (30,25))
         self.button1.Bind(wx.EVT_BUTTON, self.LeftButton)
         self.button2.Bind(wx.EVT_BUTTON, self.RightButton)
         self.button1.Bind(wx.EVT_BUTTON, self.LeftText)
         self.button2.Bind(wx.EVT_BUTTON, self.RightText)
-        self.textleft = wx.TextCtrl(panel, id=3, pos=(120, 40), size=(70, 25))
-        self.textright = wx.TextCtrl(panel, id=4, pos=(120, 70), size=(70, 25))
-        self.textmid = wx.TextCtrl(panel, id=5, pos=(120, 100), size=(70,25))
-        self.textcurr = wx.TextCtrl(panel, id=6, pos=(120, 130), size=(70,25))
+        self.textleft = wx.TextCtrl(panel, id=3, pos=(115, 40), size=(70, 25))
+        self.textright = wx.TextCtrl(panel, id=4, pos=(115, 70), size=(70, 25))
+        self.textmid = wx.TextCtrl(panel, id=5, pos=(115, 100), size=(70,25))
+        self.textcurr = wx.TextCtrl(panel, id=6, pos=(115, 130), size=(70,25))
         
         self.orim = wx.ImageFromBuffer(int(np.size(self.spec , axis = 1)), int(np.size(self.spec, axis = 0)), np.uint8(self.spec))
         self.orim = self.orim.Rescale(self.orim.GetWidth(), 140)
@@ -206,7 +213,7 @@ class SpecFrame(wx.Frame):
         
     def sliderUpdate1(self, event):
         self.pos = self.sld.GetValue()
-        #str = "pos = %f" % (self.pos/150.0)
+        self.wind.overlay.Reset()
         self.orim = wx.ImageFromBuffer(int(np.size(self.spec , axis = 1)), int(np.size(self.spec, axis = 0)), np.uint8(self.spec))
         NWID = round(self.bm.GetWidth() * self.pos/200.0)
         NHET = round(self.im.GetHeight())
@@ -237,28 +244,28 @@ class SpecFrame(wx.Frame):
     def LeftText(self, event):
         self.textleft.Clear()
         if self.wind.LeftClickFlag ==1:
-                self.textleft.WriteText(str(self.wind.LeX))
+                self.textleft.WriteText(str(int(self.wind.LeX/self.ratio/60))+":"+str(int(self.wind.LeX/self.ratio%60)))
         event.Skip()
 
     def RightText(self, event):
         self.textright.Clear()
         if self.wind.RightClickFlag==1:
-                self.textright.WriteText(str(self.wind.RiX))
+                self.textright.WriteText(str(int(self.wind.RiX/self.ratio/60))+":"+str(int(self.wind.RiX/self.ratio%60)))
         event.Skip()
 
     def MidText(self, event):
         self.textmid.Clear()
-        self.textmid.WriteText(str(-self.wind.CalcScrolledPosition(0,0)[0] + 150))
+        self.textmid.WriteText(str(int((-self.wind.CalcScrolledPosition(0,0)[0] + 150)/self.ratio/60))+":"+str(int((-self.wind.CalcScrolledPosition(0,0)[0] + 150)/self.ratio%60)))
         event.Skip()
 
     def CurrText(self, event):
         self.textcurr.Clear()
-        self.textcurr.WriteText(str(self.wind.CurrPos+50))
+        self.textcurr.WriteText(str(int((self.wind.CurrPos+50)/self.ratio/60))+":"+str(int((self.wind.CurrPos+50)/self.ratio%60)))
         event.Skip()
         
 if __name__=='__main__':
     app = wx.PySimpleApp()
-    f = SpecFrame()
+    f = SimFrame()
     f.Show()
     app.MainLoop()
         
