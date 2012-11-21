@@ -175,6 +175,7 @@ class SpecFrame(wx.Frame):
         self.textcurr = wx.TextCtrl(panel, id=6, pos=(120, 130), size=(70,25))
         
         self.orim = wx.ImageFromBuffer(int(np.size(self.spec , axis = 1)), int(np.size(self.spec, axis = 0)), np.uint8(self.spec))
+        self.orim = self.orim.Rescale(self.orim.GetWidth(), 120)
         self.im = self.orim
         self.bm = self.im.ConvertToBitmap()
 
