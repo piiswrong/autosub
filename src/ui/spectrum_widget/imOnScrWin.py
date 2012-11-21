@@ -139,10 +139,11 @@ class ImageWindow(wx.ScrolledWindow):
         self.Refresh()
         event.Skip()
 
-"""class SimFrame(wx.Frame):
+class SimFrame(wx.Frame):
         def __init__(self):
                 wx.Frame.__init__(self,None,-1,"Frame")
-                self.panel=SpecPanel(self)"""
+                self.panel=SpecPanel(self)
+                self.SetSize((500,200))
 
             
 class SpecPanel(wx.Panel):
@@ -169,16 +170,16 @@ class SpecPanel(wx.Panel):
         self.SetAcceleratorTable(acceltbl)
         
         #ADD TWO BUTTONS TO MANIPULATE THE LEFT AND RIGHT BORDER
-        self.button1 = wx.Button(panel, id=1, label='left', pos = (120,5), size = (30,25))
-        self.button2 = wx.Button(panel, id=2, label='right', pos=(155,5), size = (30,25))
+        self.button1 = wx.Button(panel, id=1, label='left', pos = (115,5), size = (30,25))
+        self.button2 = wx.Button(panel, id=2, label='right', pos=(150,5), size = (30,25))
         self.button1.Bind(wx.EVT_BUTTON, self.LeftButton)
         self.button2.Bind(wx.EVT_BUTTON, self.RightButton)
         self.button1.Bind(wx.EVT_BUTTON, self.LeftText)
         self.button2.Bind(wx.EVT_BUTTON, self.RightText)
-        self.textleft = wx.TextCtrl(panel, id=3, pos=(120, 40), size=(70, 25))
-        self.textright = wx.TextCtrl(panel, id=4, pos=(120, 70), size=(70, 25))
-        self.textmid = wx.TextCtrl(panel, id=5, pos=(120, 100), size=(70,25))
-        self.textcurr = wx.TextCtrl(panel, id=6, pos=(120, 130), size=(70,25))
+        self.textleft = wx.TextCtrl(panel, id=3, pos=(115, 40), size=(70, 25))
+        self.textright = wx.TextCtrl(panel, id=4, pos=(115, 70), size=(70, 25))
+        self.textmid = wx.TextCtrl(panel, id=5, pos=(115, 100), size=(70,25))
+        self.textcurr = wx.TextCtrl(panel, id=6, pos=(115, 130), size=(70,25))
         
         self.orim = wx.ImageFromBuffer(int(np.size(self.spec , axis = 1)), int(np.size(self.spec, axis = 0)), np.uint8(self.spec))
         self.orim = self.orim.Rescale(self.orim.GetWidth(), 140)
@@ -262,9 +263,9 @@ class SpecPanel(wx.Panel):
         self.textcurr.WriteText(str(int((self.wind.CurrPos+50)/self.ratio/60))+":"+str(int((self.wind.CurrPos+50)/self.ratio%60)))
         event.Skip()
         
-"""if __name__=='__main__':
+if __name__=='__main__':
     app = wx.PySimpleApp()
     f = SimFrame()
     f.Show()
-    app.MainLoop()"""
+    app.MainLoop()
         
