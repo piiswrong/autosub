@@ -148,12 +148,13 @@ class SpecFrame(wx.Frame):
         self.spec = specW*255.0
 
         panel = wx.Panel(self, -1)
+        self.ratio = 15.69565217391304
         
         self.sld = wx.Slider(panel, value = 200, minValue = 150, maxValue =500,pos = (10,10),
-                        size=(55, 150), style=wx.SL_VERTICAL | wx.SL_AUTOTICKS | wx.SL_LABELS)
+                        size=(55, 150), style=wx.SL_VERTICAL | wx.SL_AUTOTICKS | wx.SL_LABELS, name='width')
         self.sld.SetTickFreq(20, 1)
         self.sld1 = wx.Slider(panel, value = 200, minValue = 150, maxValue =500,pos = (60,10),
-                        size=(55, 150), style=wx.SL_VERTICAL| wx.SL_AUTOTICKS | wx.SL_LABELS )
+                        size=(55, 150), style=wx.SL_VERTICAL| wx.SL_AUTOTICKS | wx.SL_LABELS)
         self.sld1.SetTickFreq(20, 1)
 
         self.Bind(wx.EVT_MENU, self.LeftButton, id=1)
@@ -206,7 +207,7 @@ class SpecFrame(wx.Frame):
         
     def sliderUpdate1(self, event):
         self.pos = self.sld.GetValue()
-        #str = "pos = %f" % (self.pos/150.0)
+        self.wind.overlay.Reset()
         self.orim = wx.ImageFromBuffer(int(np.size(self.spec , axis = 1)), int(np.size(self.spec, axis = 0)), np.uint8(self.spec))
         NWID = round(self.bm.GetWidth() * self.pos/200.0)
         NHET = round(self.im.GetHeight())
@@ -237,23 +238,23 @@ class SpecFrame(wx.Frame):
     def LeftText(self, event):
         self.textleft.Clear()
         if self.wind.LeftClickFlag ==1:
-                self.textleft.WriteText(str(self.wind.LeX))
+                self.textleft.WriteText(str(int(self.wind.LeX/self.ratio/60))+":"+str(int(self.wind.LeX/self.ratio%60)))
         event.Skip()
 
     def RightText(self, event):
         self.textright.Clear()
         if self.wind.RightClickFlag==1:
-                self.textright.WriteText(str(self.wind.RiX))
+                self.textright.WriteText(str(int(self.wind.RiX/self.ratio/60))+":"+str(int(self.wind.RiX/self.ratio%60)))
         event.Skip()
 
     def MidText(self, event):
         self.textmid.Clear()
-        self.textmid.WriteText(str(-self.wind.CalcScrolledPosition(0,0)[0] + 150))
+        self.textmid.WriteText(str(int((-self.wind.CalcScrolledPosition(0,0)[0] + 150)/self.ratio/60))+":"+str(int((-self.wind.CalcScrolledPosition(0,0)[0] + 150)/self.ratio%60)))
         event.Skip()
 
     def CurrText(self, event):
         self.textcurr.Clear()
-        self.textcurr.WriteText(str(self.wind.CurrPos+50))
+        self.textcurr.WriteText(str(int((self.wind.CurrPos+50)/self.ratio/60))+":"+str(int((self.wind.CurrPos+50)/self.ratio%60)))
         event.Skip()
         
 if __name__=='__main__':
