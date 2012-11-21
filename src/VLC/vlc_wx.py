@@ -237,10 +237,10 @@ class MyFrame(wx.Frame):
 
 
                 
-                BigSizer.SetMinSize((900, 400))
+                BigSizer.SetMinSize((900, 450))
 
                 self.SetSizer(BigSizer)
-                self.SetMinSize((900, 400))
+                self.SetMinSize((900, 450))
 
                 # finally create the timer, which updates the timeslider
                 self.timer = wx.Timer(self)
