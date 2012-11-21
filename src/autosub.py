@@ -5,13 +5,12 @@ import VLC.vlc_wx as vlc_wx
 import sys
 import wx
 
+
 class MainFrame(vlc_wx.MyFrame):
     def __init__(self,title):
         fram=vlc_wx.MyFrame.__init__(self,title)
         self.subtitle=None
         self.ohandle=None
-
-
         # variable
         self.end=0
 
@@ -35,7 +34,10 @@ class MainFrame(vlc_wx.MyFrame):
         # Set target name
         if not target:
             target = source[:source.rfind('.')] + '.srt'
-        self.subtitle=target    
+        self.subtitle=target       
+        
+        self.currentfile=None
+        
         dec = fd.ffmpeg_decoder(source)
         vad = naive_vad(dec.ostream.get_handle())
         sub = sg.sub_generator(vad.ostream.get_handle(), source, target, lang_from = lang_from, lang_to = lang_to)
@@ -46,11 +48,13 @@ class MainFrame(vlc_wx.MyFrame):
 
     def OnTimer(self,evt):
         super(MainFrame, self).OnTimer(self)
-        self.player.video_set_subtitle_file(None)
-        self.player.video_set_subtitle_file(self.subtitle)
-        
-        if self.ohandle.has_data(1):
-            (start,self.end,text)=self.ohandle.read(1)[2][0][0]
+
+        if self.ohandle.has_data(1):            
+            (start,self.end,text)=self.ohandle.read(1)[2][0][0]            
+            self.player.video_set_subtitle_file(self.subtitle)
+            
+            
+
 
         # Set buffer time
         self.buffergauge.SetValue(self.end*self.buffergauge.GetRange()*1000/self.player.get_length())
