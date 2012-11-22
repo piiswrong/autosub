@@ -126,25 +126,25 @@ class Subtitle(wx.Panel):
         save.SetBackgroundColour(bback)  
         save.SetForegroundColour(Fontcolor)  
 
-        add   = wx.Button(self, label="Add",pos=(115,340))
+        add   = wx.Button(self, label="Add",pos=(150,340))
         add.SetFont(myfont)   
         add.SetBackgroundColour(bback)  
         add.SetForegroundColour(Fontcolor)  
 
-        delete = wx.Button(self,label="Delete",pos=(225,340))
+        delete = wx.Button(self,label="Delete",pos=(285,340))
         delete.SetFont(myfont)   
         delete.SetBackgroundColour(bback)  
         delete.SetForegroundColour(Fontcolor)  
 
-        readfile=wx.Button(self,label="Read",pos=(120,15))
-        readfile.SetFont(myfont)   
-        readfile.SetBackgroundColour(bback)  
-        readfile.SetForegroundColour(Fontcolor)  
+        # readfile=wx.Button(self,label="Read",pos=(120,15))
+        # readfile.SetFont(myfont)   
+        # readfile.SetBackgroundColour(bback)  
+        # readfile.SetForegroundColour(Fontcolor)  
 
-        writefile=wx.Button(self,label="Write",pos=(200,15))
-        writefile.SetFont(myfont)   
-        writefile.SetBackgroundColour(bback)  
-        writefile.SetForegroundColour(Fontcolor)  
+        # writefile=wx.Button(self,label="Write",pos=(200,15))
+        # writefile.SetFont(myfont)   
+        # writefile.SetBackgroundColour(bback)  
+        # writefile.SetForegroundColour(Fontcolor)  
 
         # ctrlbar = wx.BoxSizer(wx.VERTICAL)
         ctrlbox = wx.BoxSizer(wx.VERTICAL)
@@ -169,8 +169,8 @@ class Subtitle(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.Additem, add)
         self.Bind(wx.EVT_BUTTON,self.deleteitem,delete)
                 # self.Bind(wx.EVT_BUTTON, self.SaveItem, save)
-        self.Bind(wx.EVT_BUTTON, self.OpenFile, readfile)
-        self.Bind(wx.EVT_BUTTON,self.SaveFile,writefile)
+        # self.Bind(wx.EVT_BUTTON, self.OpenFile, readfile)
+        # self.Bind(wx.EVT_BUTTON,self.SaveFile,writefile)
 
         # box3.Add(stop,flag=wx.RIGHT,border=5)
         # box3.Add((-1, -1), 1)
@@ -222,6 +222,7 @@ class Subtitle(wx.Panel):
         self.begintime.SetBackgroundColour((57,59,66));
         self.begintime.SetFont(myfont);
         self.begintime.SetForegroundColour(Fontcolor); 
+        self.begintime.SetValue("00:00:00.000");
 
         self.endtext=wx.StaticText(self,-1,"End Time:",(leftedge,75));
         self.endtext.SetFont(myfont);
@@ -232,6 +233,8 @@ class Subtitle(wx.Panel):
         self.endtime.SetBackgroundColour((57,59,66));
         self.endtime.SetFont(myfont);
         self.endtime.SetForegroundColour(Fontcolor); 
+        self.endtime.SetValue("00:00:00.000");
+
 
         self.text=wx.StaticText(self,-1,"Content",(leftedge,125))
         self.text.SetFont(myfont);

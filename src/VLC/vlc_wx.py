@@ -4,7 +4,7 @@ import wx.lib.platebtn as pbtn
 import wx.lib.stattext as stattext
 import sys
 import myvlc.vlc as vlc
-
+from spectrum_widget.imOnScrWin import *
 # import standard libraries
 import os
 import user
@@ -52,11 +52,12 @@ class MyFrame(wx.Frame):
                 self.frame_menubar.Append(self.edit_menu, "&Edit")
 
                 #  Audio Menu
-                self.audio_menu=wx.Menu()
-                self.audio_menu.Append(-1,"NULL")
-                self.audio_menu.AppendSeparator()
-                self.audio_menu.Append(-1,"NULL")
-                self.frame_menubar.Append(self.audio_menu, "Audio")
+                self.sub=wx.Menu()
+                op=self.sub.Append(-1,"Open Subtitle")
+                self.sub.AppendSeparator()
+                sa=self.sub.Append(-1,"Save Subtitle")
+
+                self.frame_menubar.Append(self.sub, "Subtitle")
 
                 #  Video Menu
                 self.video_menu=wx.Menu()
@@ -97,6 +98,7 @@ class MyFrame(wx.Frame):
                 #Panels
                 # This is the subtitlepanel
                 self.subtitlepanel=wx.Panel(self, -1);
+
                 # The first panel of the video
                 self.videopanel = wx.Panel(self, -1)
                 self.videopanel.SetBackgroundColour(wx.BLACK)
@@ -204,6 +206,8 @@ class MyFrame(wx.Frame):
                 subsizer.SetMinSize((400,450));
 
                 subpanel=Subtitle(self,-1);
+                self.Bind(wx.EVT_MENU, subpanel.OpenFile, op);
+                self.Bind(wx.EVT_MENU, subpanel.SaveFile, sa);
                 subpanel.SetSizer(subsizer);
                 ####################################CUTTING LINE######################################
                 
@@ -237,6 +241,9 @@ class MyFrame(wx.Frame):
                 # Set the Fast Key
                 acceltbl=wx.AcceleratorTable([(wx.ACCEL_CTRL,ord('O'),1),(wx.ACCEL_CTRL,ord('C'),2),(wx.ACCEL_CTRL,ord('P'),3),(wx.ACCEL_CTRL,ord('A'),4),(wx.ACCEL_CTRL,ord('S'),5),(wx.ACCEL_CTRL,ord('F'),6),(wx.ACCEL_CTRL,ord('V'),7)])
                 self.SetAcceleratorTable(acceltbl)
+        def SetTheSpec(self,evt):
+                return 
+
 
         def OnExit(self, evt):
                 self.player.stop()
