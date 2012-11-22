@@ -4,7 +4,7 @@ import wx.lib.platebtn as pbtn
 import wx.lib.stattext as stattext
 import sys
 import myvlc.vlc as vlc
-from spectrum_widget.imOnScrWin import *
+from spectrum_widget.SpecWin import *
 # import standard libraries
 import os
 import user
