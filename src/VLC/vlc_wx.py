@@ -107,11 +107,11 @@ class MyFrame(wx.Frame):
                 ctrlpanel = wx.Panel(self, -1 )
 
                 #  timeslider
-                self.timeslider = wx.Slider(ctrlpanel, -1, 0, 0, 1000,size=(560,20)) #timeline
+                self.timeslider = wx.Slider(ctrlpanel, -1, 0, 0, 1000,size=(565,20)) #timeline
                 self.timeslider.SetRange(0, 1000)
                 self.timeslider.SetBackgroundColour(Backgroud)
                 #  buffergauge
-                self.buffergauge = wx.Gauge(ctrlpanel, -1,1000,size=(550,5)) 
+                self.buffergauge = wx.Gauge(ctrlpanel, -1,1000,size=(560,5)) 
                 self.buffergauge.SetRange(1000)
                 self.buffergauge.SetBackgroundColour(Backgroud)
                 #  display time                                                                          
@@ -223,10 +223,10 @@ class MyFrame(wx.Frame):
 
 
                 
-                BigSizer.SetMinSize((970, 450))
+                BigSizer.SetMinSize((980, 450))
 
                 self.SetSizer(BigSizer)
-                self.SetMinSize((970, 450))
+                self.SetMinSize((980, 450))
 
                 # finally create the timer, which updates the timeslider
                 self.timer = wx.Timer(self)
