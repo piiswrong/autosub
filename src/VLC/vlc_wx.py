@@ -1,6 +1,7 @@
 # import external libraries
 import wx # 2.8
 import wx.lib.platebtn as pbtn
+import wx.lib.stattext as stattext
 import sys
 import myvlc.vlc as vlc
 
@@ -104,16 +105,17 @@ class MyFrame(wx.Frame):
                 ctrlpanel = wx.Panel(self, -1 )
 
                 #  timeslider
-                self.timeslider = wx.Slider(ctrlpanel, -1, 0, 0, 1000,size=(500,20)) #timeline
+                self.timeslider = wx.Slider(ctrlpanel, -1, 0, 0, 1000,size=(560,20)) #timeline
                 self.timeslider.SetRange(0, 1000)
                 self.timeslider.SetBackgroundColour(Backgroud)
                 #  buffergauge
-                self.buffergauge = wx.Gauge(ctrlpanel, -1,1000,size=(495,5)) 
+                self.buffergauge = wx.Gauge(ctrlpanel, -1,1000,size=(550,5)) 
                 self.buffergauge.SetRange(1000)
                 self.buffergauge.SetBackgroundColour(Backgroud)
                 #  display time                                                                          
-                self.displaytime=wx.StaticText(ctrlpanel, -1, "00:00/00:00")
-                self.displaytime.SetBackgroundColour(Backgroud)                
+                self.displaytime=stattext.GenStaticText(ctrlpanel, -1, "00:00/00:00",style=wx.ALIGN_RIGHT)
+                self.displaytime.SetBackgroundColour(Backgroud)
+                self.displaytime.SetFont(myfont)
 
                 #  pause button
                 pause  = pbtn.PlateButton(ctrlpanel)
@@ -177,7 +179,7 @@ class MyFrame(wx.Frame):
                 self.Bind(wx.EVT_BUTTON, self.OnFeedBack, self.feedback)
                 # Give a pretty layout to the controls                
                 ctrlbox=wx.GridBagSizer(vgap=0, hgap=0)
-                ctrlbox.Add(self.displaytime,(0,0),(1,2))                
+                ctrlbox.Add(self.displaytime,(0,1))                
                 ctrlbox.Add(self.volume,(0,8))                
                 ctrlbox.Add(self.volslider,(0,9))
                 ctrlbox.Add(self.timeslider,(1,0),span=(1,10))
@@ -197,9 +199,9 @@ class MyFrame(wx.Frame):
                 
                 sizer.Add(self.videopanel, 1, flag=wx.EXPAND)
                 sizer.Add(ctrlpanel, flag=wx.EXPAND | wx.BOTTOM | wx.TOP, border=10)
-                sizer.SetMinSize((420, 450))
+                sizer.SetMinSize((400, 450))
                 subsizer=wx.BoxSizer(wx.VERTICAL);
-                subsizer.SetMinSize((420,450));
+                subsizer.SetMinSize((400,450));
 
                 subpanel=Subtitle(self,-1);
                 subpanel.SetSizer(subsizer);
@@ -217,10 +219,10 @@ class MyFrame(wx.Frame):
 
 
                 
-                BigSizer.SetMinSize((950, 450))
+                BigSizer.SetMinSize((970, 450))
 
                 self.SetSizer(BigSizer)
-                self.SetMinSize((950, 450))
+                self.SetMinSize((970, 450))
 
                 # finally create the timer, which updates the timeslider
                 self.timer = wx.Timer(self)
