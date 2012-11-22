@@ -24,11 +24,11 @@ class ImageWindow(wx.ScrolledWindow):
         self.Bind(wx.EVT_PAINT, self.OnPaint)
         self.Bind(wx.EVT_LEFT_DOWN, self.OnMouseClick)
         self.Bind(wx.EVT_RIGHT_DOWN, self.OnRightClick)
+        self.Bind(wx.EVT_LEFT_UP, self.OnLeftUp)
         self.timer = wx.Timer(self)
         self.timer.Start(1000)
         self.Bind(wx.EVT_TIMER, self.OnTimer, self.timer)
         #ADD MOUSE DRAG EVENT TO REPLACE SCROLLING
-        self.Bind(wx.EVT_MOTION, self.OnMotion)
         self.overlay=wx.Overlay()
         #ruler=RC.RulerCtrl(self, -1, pos=(0, np.size(specW, axis=0)), size=(np.size(specW , axis = 1),1),orient=wx.HORIZONTAL, style=wx.NO_BORDER)
         #ruler.SetFlip(flip=True)
@@ -75,13 +75,6 @@ class ImageWindow(wx.ScrolledWindow):
         dc.DrawLine(self.CurrPos, 0, self.CurrPos, 150)
         del odc
         #SKIP THE DRAWING OF RULER WHICH SEVERELY STUCK THE RENDERING
-        """dc.SetPen(wx.Pen('white',1))
-        dc.SetTextForeground('white')
-        for i in range(-self.CalcScrolledPosition(0,0)[0], self.bitmap.GetWidth(), 10):
-                dc.DrawLine(i, self.bitmap.GetHeight(), i, self.bitmap.GetHeight()+5)
-                font = wx.Font(7, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_LIGHT)
-                dc.SetFont(font)
-                dc.DrawText(str(i), i, self.bitmap.GetHeight()+5)"""
         event.Skip()
 
 
@@ -90,9 +83,18 @@ class ImageWindow(wx.ScrolledWindow):
         #print event.GetLogicalPosition(self.cdc)
         self.LeftClickFlag = 1
         self.LeX=event.X -self.CalcScrolledPosition(0,0)[0]
+        self.Startx = self.LeX
+        print self.Startx
         self.Refresh()
         #self.CaptureMouse()
         #del odc
+        event.Skip()
+
+    def OnLeftUp(self, event):
+        self.Endx = event.X - self.CalcScrolledPosition(0,0)[0]
+        print self.Endx
+        if self.Endx != self.Startx:
+            self.Scroll(-self.CalcScrolledPosition(0,0)[0] + self.Endx - self.Startx, 0)
         event.Skip()
 
     def OnRightClick(self, event):
@@ -106,8 +108,6 @@ class ImageWindow(wx.ScrolledWindow):
         self.Refresh()
         event.Skip()
 
-    def OnMotion(self, event):
-        pass
 
 
 class SimFrame(wx.Frame):
@@ -127,6 +127,7 @@ class SpecPanel(wx.Panel):
         self.spec = self.specW*255.0
 
         panel = wx.Panel(self, -1)
+
         self.ratio = 15.69565217391304
 
         self.sld = wx.Slider(panel, value = 200, minValue = 150, maxValue =500,pos = (0,10),
