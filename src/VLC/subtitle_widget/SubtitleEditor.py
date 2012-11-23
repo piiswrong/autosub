@@ -371,7 +371,11 @@ class Subtitle(wx.Panel):
         dd=int(num)
 
         self.listBox.Delete(dd);
-
+    def AddSub(self,event,st,et,context):
+        srt=' '+st+' -- '+et+' '+context;
+        ad=srt.decode('utf-8','ignore');
+        self.listBox.Append(ad);
+        
     def OpenTheFile(self,event,url):
         foot=url;
         if(foot[len(foot)-1] == 't' ):
