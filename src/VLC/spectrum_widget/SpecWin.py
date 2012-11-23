@@ -1,7 +1,6 @@
 # -*- coding: cp936 -*-
 import wx
 from pylab import *
-import sys
 
 import core.ffmpeg_decoder as fd
 import core.spectrum as sp
@@ -25,11 +24,11 @@ class ImageWindow(wx.ScrolledWindow):
         self.Bind(wx.EVT_PAINT, self.OnPaint)
         self.Bind(wx.EVT_LEFT_DOWN, self.OnMouseClick)
         self.Bind(wx.EVT_RIGHT_DOWN, self.OnRightClick)
+        #ADD MOUSE DRAG EVENT TO REPLACE SCROLLING
         self.Bind(wx.EVT_LEFT_UP, self.OnLeftUp)
         self.timer = wx.Timer(self)
-        self.timer.Start(1000)
+        self.timer.Start(100)
         self.Bind(wx.EVT_TIMER, self.OnTimer, self.timer)
-        #ADD MOUSE DRAG EVENT TO REPLACE SCROLLING
         self.overlay=wx.Overlay()
         #ruler=RC.RulerCtrl(self, -1, pos=(0, np.size(specW, axis=0)), size=(np.size(specW , axis = 1),1),orient=wx.HORIZONTAL, style=wx.NO_BORDER)
         #ruler.SetFlip(flip=True)
@@ -83,9 +82,9 @@ class ImageWindow(wx.ScrolledWindow):
     def OnMouseClick(self, event):
         #print event.GetLogicalPosition(self.cdc)
         self.LeftClickFlag = 1
-        self.LeX=event.X -self.CalcScrolledPosition(0,0)[0]
+        self.OLeX=event.X -self.CalcScrolledPosition(0,0)[0]
+        self.LeX = self.OLeX
         self.Startx = self.LeX
-        print self.Startx
         self.Refresh()
         #self.CaptureMouse()
         #del odc
@@ -93,7 +92,6 @@ class ImageWindow(wx.ScrolledWindow):
 
     def OnLeftUp(self, event):
         self.Endx = event.X - self.CalcScrolledPosition(0,0)[0]
-        print self.Endx
         if self.Endx != self.Startx:
             self.Scroll(-self.CalcScrolledPosition(0,0)[0] + self.Endx - self.Startx, 0)
         event.Skip()
@@ -105,7 +103,7 @@ class ImageWindow(wx.ScrolledWindow):
         event.Skip()
 
     def OnTimer(self, event):
-        self.CurrPos = self.CurrPos + 15
+        self.CurrPos = self.CurrPos + 1.5
         self.Refresh()
         event.Skip()
 
@@ -126,6 +124,8 @@ class SpecPanel(wx.Panel):
         self.specW=self.OpenData(self)
         #self.orim = Image.fromarray(specW)
         self.spec = self.specW*255.0
+        #SET THE DEFAULT VALUE OF THE SLIDER POS
+        self.pos = 200
 
         panel = wx.Panel(self, -1)
 
@@ -231,7 +231,6 @@ class SpecPanel(wx.Panel):
                 list = [vector]
             else:
                 specW = np.append(specW, vector, axis = 1)
-                print sys.getsizeof(specW)
                 list.append(vector)
             Num = Num + 1
         return specW
@@ -239,59 +238,74 @@ class SpecPanel(wx.Panel):
 
     def DisplaySpec(self, event):
         #RECEIVE A SIGNAL AS THE DISPLAY FLAG
-        Spec_Flag = 0
+        Spec_Flag = 1
         return Spec_Flag
     
     def sliderUpdate1(self, event):
         self.pos = self.sld.GetValue()
         self.wind.overlay.Reset()
-        self.orim = wx.ImageFromBuffer(int(np.size(self.spec , axis = 1)), int(np.size(self.spec, axis = 0)), np.uint8(self.spec))
+        if self.Spec_Flag == 1:
+            self.orim = wx.ImageFromBuffer(int(np.size(self.spec , axis = 1)), int(np.size(self.spec, axis = 0)), np.uint8(self.spec))
+        else:
+            self.orim = wx.Image('../Icons/speceg.jpg', wx.BITMAP_TYPE_JPEG)
         NWID = round(self.bm.GetWidth() * self.pos/200.0)
         NHET = round(self.im.GetHeight())
         self.im = self.orim.Rescale(NWID ,NHET)
         self.wind.SetBitmap(self.im.ConvertToBitmap())
+        if self.wind.LeftClickFlag == 1:
+            self.wind.LeX = self.wind.OLeX*self.pos/200.0
+            self.LeftText(self)
         self.wind.Refresh()
 
     def sliderUpdate2(self, event):
         self.pos = self.sld1.GetValue()
         self.wind.Refresh()
-        self.wind.overlay.Reset()
-        self.spec = self.specW*self.pos
-        self.im = wx.ImageFromBuffer(int(np.size(self.spec, axis = 1)), int(np.size(self.spec, axis = 0)), np.uint8(self.spec))
-        self.im=self.im.Rescale(self.im.GetWidth(), 140)
-        self.wind.SetBitmap(self.im.ConvertToBitmap())
+        if self.Spec_Flag ==  1:
+            self.wind.overlay.Reset()
+            self.spec = self.specW*self.pos
+            self.im = wx.ImageFromBuffer(int(np.size(self.spec, axis = 1)), int(np.size(self.spec, axis = 0)), np.uint8(self.spec))
+            self.im=self.im.Rescale(self.im.GetWidth(), 140)
+            self.wind.SetBitmap(self.im.ConvertToBitmap())
+        else:
+            pass
 
 
     def LeftButton(self, event):
-        self.wind.LeX = self.wind.LeX -1
-        self.wind.Refresh()
+        if self.wind.LeftClickFlag == 1:
+            self.wind.LeX = self.wind.LeX -self.pos/200.0
+            self.wind.Refresh()
         event.Skip()
 
     def RightButton(self, event):
-        self.wind.RiX = self.wind.RiX +1
-        self.wind.Refresh()
+        if self.wind.RightClickFlag == 1:
+            self.wind.RiX = self.wind.RiX +self.pos/200.0
+            self.wind.Refresh()
         event.Skip()
 
     def LeftText(self, event):
         self.textleft.Clear()
         if self.wind.LeftClickFlag ==1:
-            self.textleft.WriteText(str(int(self.wind.LeX/self.ratio/60/60))+":"+str(int(self.wind.LeX/self.ratio/60))+":"+str(int(self.wind.LeX/self.ratio%60)))
+            time = self.wind.LeX * self.pos/200/self.ratio
+            self.textleft.WriteText(str(int(time/60/60))+":"+str(int(time/60))+":"+str(int(time%60)) + ":"+str(int(((round(time, 2) - int(time))*100))))
         event.Skip()
 
     def RightText(self, event):
         self.textright.Clear()
         if self.wind.RightClickFlag==1:
-            self.textright.WriteText(str(int(self.wind.RiX/self.ratio/60/60))+":"+str(int(self.wind.RiX/self.ratio/60))+":"+str(int(self.wind.RiX/self.ratio%60)))
+            time = self.wind.RiX * self.pos/200/self.ratio
+            self.textright.WriteText(str(int(time/60/60))+":"+str(int(time/60))+":"+str(int(time%60)) + ":"+str(int(((round(time, 2) - int(time))*100))))
         event.Skip()
 
     def MidText(self, event):
         self.textmid.Clear()
-        self.textmid.WriteText(str(int((-self.wind.CalcScrolledPosition(0,0)[0] + 150)/self.ratio/60/60))+":"+str(int((-self.wind.CalcScrolledPosition(0,0)[0] + 150)/self.ratio/60))+":"+str(int((-self.wind.CalcScrolledPosition(0,0)[0] + 150)/self.ratio%60)))
+        time = (-self.wind.CalcScrolledPosition(0,0)[0] + 150)/self.ratio
+        self.textmid.WriteText(str(int(time/60/60))+":"+str(int(time/60))+":"+str(int(time%60))+ ":"+str(int(((round(time, 2) - int(time))*100))))
         event.Skip()
 
     def CurrText(self, event):
         self.textcurr.Clear()
-        self.textcurr.WriteText(str(int((self.wind.CurrPos+50)/self.ratio/60/60))+":"+str(int((self.wind.CurrPos+50)/self.ratio/60))+":"+str(int((self.wind.CurrPos+50)/self.ratio%60)))
+        time = (self.wind.CurrPos+50)/self.ratio
+        self.textcurr.WriteText(str(int(time/60/60))+":"+str(int(time/60))+":"+str(int(time%60))+ ":"+str(int(((round(time, 2) - int(time))*100))))
         event.Skip()
 
 if __name__=='__main__':
