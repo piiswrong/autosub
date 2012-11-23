@@ -48,7 +48,6 @@ class MainFrame(vlc_wx.MyFrame):
 
     def OnTimer(self,evt):
         super(MainFrame, self).OnTimer(self)
-
         if self.ohandle.has_data(1):            
             (start,self.end,text)=self.ohandle.read(1)[2][0][0]            
             self.player.video_set_subtitle_file(self.subtitle)
@@ -56,6 +55,8 @@ class MainFrame(vlc_wx.MyFrame):
         if self.player.get_length()!=0:
             self.buffergauge.SetValue(self.end*self.buffergauge.GetRange()*1000/self.player.get_length())        
         # Link with subtitle
+        self.subpanel.OpenTheFile(self.subpanel,self.subtitle)
+        
 if __name__ == '__main__':
         # Create a wx.App(), which handles the windowing system event loop
         app = wx.PySimpleApp()

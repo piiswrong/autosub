@@ -207,10 +207,10 @@ class MyFrame(wx.Frame):
                 subsizer=wx.BoxSizer(wx.VERTICAL);
                 subsizer.SetMinSize((400,450));
 
-                subpanel=Subtitle(self,-1);
-                self.Bind(wx.EVT_MENU, subpanel.OpenFile, op);
-                self.Bind(wx.EVT_MENU, subpanel.SaveFile, sa);
-                subpanel.SetSizer(subsizer);
+                self.subpanel=Subtitle(self,-1);
+                self.Bind(wx.EVT_MENU, self.subpanel.OpenFile, op);
+                self.Bind(wx.EVT_MENU, self.subpanel.SaveFile, sa);
+                self.subpanel.SetSizer(subsizer);
                 ####################################CUTTING LINE######################################
                 
                 splitter = wx.SplitterWindow(self, -1, style=wx.SP_LIVE_UPDATE)
@@ -219,7 +219,7 @@ class MyFrame(wx.Frame):
                 # BigSizer.Add(subpanelf,flag=wx.EXPAND|wx.RIGHT);
                 ####################################END Here##########################################
                 
-                BigSizer.Add(subpanel,flag=wx.EXPAND);
+                BigSizer.Add(self.subpanel,flag=wx.EXPAND);
                 BigSizer.Add(splitter,flag=wx.EXPAND)
                 BigSizer.Add(sizer,flag=wx.EXPAND|wx.RIGHT)
 
@@ -510,4 +510,5 @@ class FeedBackDialog(wx.Dialog):
                 return self.mail.GetValue()
         def GetSuggestion(self):
                 return self.suggestion.GetValue()
+
 
