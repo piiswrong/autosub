@@ -4,7 +4,7 @@ import wx.lib.platebtn as pbtn
 import wx.lib.stattext as stattext
 import sys
 import myvlc.vlc as vlc
-from spectrum_widget.imOnScrWin import *
+from spectrum_widget.SpecWin import *
 # import standard libraries
 import os
 import user
@@ -200,7 +200,7 @@ class MyFrame(wx.Frame):
                 sizer.SetMinSize((400, 450))
                 subsizer=wx.BoxSizer(wx.VERTICAL);
                 subsizer.SetMinSize((400,450));
-
+                #####################################Subtitle Panel###################################
                 self.subpanel=Subtitle(self,-1);
                 self.Bind(wx.EVT_MENU, self.subpanel.OpenFile, op);
                 self.Bind(wx.EVT_MENU, self.subpanel.SaveFile, sa);
@@ -216,9 +216,9 @@ class MyFrame(wx.Frame):
                 BigSizer.Add(self.subpanel,flag=wx.EXPAND);
                 BigSizer.Add(splitter,flag=wx.EXPAND)
                 BigSizer.Add(sizer,flag=wx.EXPAND|wx.RIGHT)
-
-
-                
+                #######################################SpectrumPanel##################################
+                Spec=SpecPanel(self);
+                BigSizer.Add(Spec,flag=wx.EXPAND)
                 BigSizer.SetMinSize((1010, 450))
 
                 self.SetSizer(BigSizer)
