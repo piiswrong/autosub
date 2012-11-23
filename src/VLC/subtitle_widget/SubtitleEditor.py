@@ -372,6 +372,17 @@ class Subtitle(wx.Panel):
 
         self.listBox.Delete(dd);
 
+    def OpenFile(self,event,url):
+        foot=url;
+        if(foot[len(foot)-1] == 't' ):
+            li=SrtParser(foot)
+        elif (foot[len(foot)-1]== 's'):
+            li=AssParser(foot);
+        self.listBox.Clear()
+        for i in li:
+            srt=' '+i[1]+' -- '+i[2]+' '+i[3];
+            ad=srt.decode('utf-8','ignore');
+            self.listBox.Append(ad);
     def OpenFile(self,event):
         file_wildcard = "All files(*.*)|*.*"
         dlg = wx.FileDialog(self, "Open subtitle file...",
