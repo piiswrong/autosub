@@ -268,6 +268,7 @@ class SpecPanel(wx.Panel):
             self.wind.RiX = self.wind.ORiX*self.pos/200.0
             self.RightText(event)
         self.wind.Refresh()
+        self.wind.Scroll(self.currx*self.pos/200.0, 0)
 
     def sliderUpdate2(self, event):
         self.pos = self.sld1.GetValue()
@@ -297,26 +298,27 @@ class SpecPanel(wx.Panel):
     def LeftText(self, event):
         self.textleft.Clear()
         if self.wind.LeftClickFlag ==1:
-            time = self.wind.LeX * self.pos/200/self.ratio
+            time = self.wind.LeX/self.ratio/self.pos*200
             self.textleft.WriteText(str(int(time/60/60))+":"+str(int(time/60))+":"+str(int(time%60)) + ":"+str(int(((round(time, 2) - int(time))*100))))
         event.Skip()
 
     def RightText(self, event):
         self.textright.Clear()
         if self.wind.RightClickFlag==1:
-            time = self.wind.RiX * self.pos/200/self.ratio
+            time = self.wind.RiX/self.ratio/self.pos*200
             self.textright.WriteText(str(int(time/60/60))+":"+str(int(time/60))+":"+str(int(time%60)) + ":"+str(int(((round(time, 2) - int(time))*100))))
         event.Skip()
 
     def MidText(self, event):
         self.textmid.Clear()
-        time = (-self.wind.CalcScrolledPosition(0,0)[0] + 150)/self.ratio
+        time = (-self.wind.CalcScrolledPosition(0,0)[0] + 150)/self.ratio*200.0/self.pos
         self.textmid.WriteText(str(int(time/60/60))+":"+str(int(time/60))+":"+str(int(time%60))+ ":"+str(int(((round(time, 2) - int(time))*100))))
+        self.currx = -self.wind.CalcScrolledPosition(0,0)[0]
         event.Skip()
 
     def CurrText(self, event):
         self.textcurr.Clear()
-        time = (self.wind.CurrPos+50)/self.ratio
+        time = (self.wind.CurrPos) * 200.0/self.pos/self.ratio
         self.textcurr.WriteText(str(int(time/60/60))+":"+str(int(time/60))+":"+str(int(time%60))+ ":"+str(int(((round(time, 2) - int(time))*100))))
         event.Skip()
 
