@@ -119,25 +119,14 @@ class SimFrame(wx.Frame):
 
 
 class SpecPanel(wx.Panel):
-    def __init__(self,parent,icon):
+    def __init__(self,parent):
 
         wx.Panel.__init__(self,parent,-1)
 
         self.Spec_Flag = 0
 
-<<<<<<< HEAD
-        self.orim = wx.Image('../Icons/speceg.jpg', wx.BITMAP_TYPE_JPEG)
-=======
-        if self.Spec_Flag == 1:
-            self.specW=self.OpenData(self)
-            #self.orim = Image.fromarray(specW)
-            self.spec = self.specW*255.0
-            
-            self.orim = wx.ImageFromBuffer(int(np.size(self.spec , axis = 1)), int(np.size(self.spec, axis = 0)), np.uint8(self.spec))
-            self.orim = self.orim.Rescale(self.orim.GetWidth(), 140)
-        else:
-            self.orim = wx.Image(icon, wx.BITMAP_TYPE_JPEG)
->>>>>>> 267b43dcd0f52c01a4eb35f020b8922ec621c50a
+        self.orim = wx.Image('./Icon/speceg.jpg', wx.BITMAP_TYPE_JPEG)
+        
         #SET THE DEFAULT VALUE OF THE SLIDER POS
         self.pos = 200
 
