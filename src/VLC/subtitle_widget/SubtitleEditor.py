@@ -372,7 +372,7 @@ class Subtitle(wx.Panel):
 
         self.listBox.Delete(dd);
 
-    def OpenFile(self,event,url):
+    def OpenTheFile(self,event,url):
         foot=url;
         if(foot[len(foot)-1] == 't' ):
             li=SrtParser(foot)
