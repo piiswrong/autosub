@@ -217,12 +217,17 @@ class MyFrame(wx.Frame):
                 BigSizer.Add(splitter,flag=wx.EXPAND)
                 BigSizer.Add(sizer,flag=wx.EXPAND|wx.RIGHT)
                 #######################################SpectrumPanel##################################
-                Spec=SpecPanel(self);
-                BigSizer.Add(Spec,flag=wx.EXPAND)
-                BigSizer.SetMinSize((1010, 450))
+                Spec=SpecPanel(self,"VLC/spectrum_widget/Icon/speceg.jpg");
+                specsizer=wx.BoxSizer(wx.VERTICAL)
+                Spec.SetSizer(specsizer);
+                specsizer.SetMinSize((400,300))
+                BigSizer.Add(specsizer,flag=wx.EXPAND)
+
+                ####################################################################################
+                BigSizer.SetMinSize((1510, 450))
 
                 self.SetSizer(BigSizer)
-                self.SetMinSize((1010, 450))
+                self.SetMinSize((1510, 450))
 
                 # finally create the timer, which updates the timeslider
                 self.timer = wx.Timer(self)
