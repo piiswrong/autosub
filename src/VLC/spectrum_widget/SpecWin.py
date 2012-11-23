@@ -123,9 +123,11 @@ class SpecPanel(wx.Panel):
 
         wx.Panel.__init__(self,parent,-1)
 
-        #IF THE SPEC_FLAG IS TRUE, SHOW THE SPEC, OTHERWISE DISPLAY THE EXAMPLE
-        self.Spec_Flag = self.DisplaySpec(self)
+        self.Spec_Flag = 0
 
+<<<<<<< HEAD
+        self.orim = wx.Image('../Icons/speceg.jpg', wx.BITMAP_TYPE_JPEG)
+=======
         if self.Spec_Flag == 1:
             self.specW=self.OpenData(self)
             #self.orim = Image.fromarray(specW)
@@ -135,17 +137,18 @@ class SpecPanel(wx.Panel):
             self.orim = self.orim.Rescale(self.orim.GetWidth(), 140)
         else:
             self.orim = wx.Image(icon, wx.BITMAP_TYPE_JPEG)
+>>>>>>> 267b43dcd0f52c01a4eb35f020b8922ec621c50a
         #SET THE DEFAULT VALUE OF THE SLIDER POS
         self.pos = 200
 
-        panel = wx.Panel(self, -1)
+        self.panel = wx.Panel(self, -1)
 
         self.ratio = 15.69565217391304
 
-        self.sld = wx.Slider(panel, value = 200, minValue = 150, maxValue =500,pos = (0,10),
+        self.sld = wx.Slider(self.panel, value = 200, minValue = 150, maxValue =500,pos = (0,10),
             size=(55, 150), style=wx.SL_VERTICAL | wx.SL_AUTOTICKS | wx.SL_LABELS, name='width')
         self.sld.SetTickFreq(20, 1)
-        self.sld1 = wx.Slider(panel, value = 200, minValue = 150, maxValue =500,pos = (55,10),
+        self.sld1 = wx.Slider(self.panel, value = 200, minValue = 150, maxValue =500,pos = (55,10),
             size=(55, 150), style=wx.SL_VERTICAL| wx.SL_AUTOTICKS | wx.SL_LABELS)
         self.sld1.SetTickFreq(20, 1)
 
@@ -156,16 +159,18 @@ class SpecPanel(wx.Panel):
         self.SetAcceleratorTable(acceltbl)
 
         #ADD TWO BUTTONS TO MANIPULATE THE LEFT AND RIGHT BORDER
-        self.button1 = wx.Button(panel, id=1, label='left', pos = (115,5), size = (30,25))
-        self.button2 = wx.Button(panel, id=2, label='right', pos=(150,5), size = (30,25))
+        self.button1 = wx.Button(self.panel, id=1, label='left', pos = (115,5), size = (30,25))
+        self.button2 = wx.Button(self.panel, id=2, label='right', pos=(150,5), size = (30,25))
+        self.button3 = wx.Button(self.panel, id=3, label='open', pos=(80,5), size = (30,25))
         self.button1.Bind(wx.EVT_BUTTON, self.LeftButton)
         self.button2.Bind(wx.EVT_BUTTON, self.RightButton)
         self.button1.Bind(wx.EVT_BUTTON, self.LeftText)
         self.button2.Bind(wx.EVT_BUTTON, self.RightText)
-        self.textleft = wx.TextCtrl(panel, id=3, pos=(115, 40), size=(70, 25))
-        self.textright = wx.TextCtrl(panel, id=4, pos=(115, 70), size=(70, 25))
-        self.textmid = wx.TextCtrl(panel, id=5, pos=(115, 100), size=(70,25))
-        self.textcurr = wx.TextCtrl(panel, id=6, pos=(115, 130), size=(70,25))
+        self.button3.Bind(wx.EVT_BUTTON, self.GetData)
+        self.textleft = wx.TextCtrl(self.panel, id=3, pos=(115, 40), size=(70, 25))
+        self.textright = wx.TextCtrl(self.panel, id=4, pos=(115, 70), size=(70, 25))
+        self.textmid = wx.TextCtrl(self.panel, id=5, pos=(115, 100), size=(70,25))
+        self.textcurr = wx.TextCtrl(self.panel, id=6, pos=(115, 130), size=(70,25))
             
         self.im = self.orim
         self.bm = self.im.ConvertToBitmap()
@@ -188,12 +193,12 @@ class SpecPanel(wx.Panel):
         #self.wind.SetScrollbars(1,0, self.im.GetWidth(), 200)
 
 
-        sizer = wx.BoxSizer (wx.HORIZONTAL)
-        sizer.Add(self.wind, 1, wx.EXPAND, 0)
-        sizer.Add(panel, wx.ALIGN_LEFT)
+        self.sizer = wx.BoxSizer (wx.HORIZONTAL)
+        self.sizer.Add(self.wind, 1, wx.EXPAND, 0)
+        self.sizer.Add(self.panel, wx.ALIGN_LEFT)
         #sizer.SetSize((500,200))
         #sizer.Add(self.ruler)
-        self.SetSizer(sizer)
+        self.SetSizer(self.sizer)
         self.SetSize((500,200))
         #self.Fit()
 
@@ -240,12 +245,20 @@ class SpecPanel(wx.Panel):
                 list.append(vector)
             Num = Num + 1
         return specW
+    
+    def GetData(self,event):
 
+        self.specW = self.OpenData(self)
+        self.spec = self.specW*255.0
+            
+        self.orim = wx.ImageFromBuffer(int(np.size(self.spec , axis = 1)), int(np.size(self.spec, axis = 0)), np.uint8(self.spec))
+        self.orim = self.orim.Rescale(self.orim.GetWidth(), 140)
+        self.wind.overlay.Reset()
+        self.wind.SetBitmap(self.orim.ConvertToBitmap())
+        self.Spec_Flag =1
+        self.im = self.orim
+        self.bm = self.im.ConvertToBitmap()
 
-    def DisplaySpec(self, event):
-        #RECEIVE A SIGNAL AS THE DISPLAY FLAG
-        Spec_Flag = 0
-        return Spec_Flag
     
     def sliderUpdate1(self, event):
         self.pos = self.sld.GetValue()
@@ -258,6 +271,7 @@ class SpecPanel(wx.Panel):
         NHET = round(self.im.GetHeight())
         self.im = self.orim.Rescale(NWID ,NHET)
         self.wind.SetBitmap(self.im.ConvertToBitmap())
+        self.wind.SetScrollbars(1,0, self.im.GetWidth(), 200)
         if self.wind.LeftClickFlag == 1:
             self.wind.LeX = self.wind.OLeX*self.pos/200.0
             self.LeftText(event)
