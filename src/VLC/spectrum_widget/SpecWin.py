@@ -255,7 +255,7 @@ class SpecPanel(wx.Panel):
         if self.Spec_Flag == 1:
             self.orim = wx.ImageFromBuffer(int(np.size(self.spec , axis = 1)), int(np.size(self.spec, axis = 0)), np.uint8(self.spec))
         else:
-            self.orim = wx.Image('../Icons/speceg.jpg', wx.BITMAP_TYPE_JPEG)
+            self.orim = wx.Image('./Icon/speceg.jpg', wx.BITMAP_TYPE_JPEG)
         NWID = round(self.bm.GetWidth() * self.pos/200.0)
         NHET = round(self.im.GetHeight())
         self.im = self.orim.Rescale(NWID ,NHET)
