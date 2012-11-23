@@ -26,6 +26,7 @@ class ImageWindow(wx.ScrolledWindow):
         self.Bind(wx.EVT_RIGHT_DOWN, self.OnRightClick)
         #ADD MOUSE DRAG EVENT TO REPLACE SCROLLING
         self.Bind(wx.EVT_LEFT_UP, self.OnLeftUp)
+        self.Bind(wx.EVT_RIGHT_UP, self.OnRightUp)
         self.timer = wx.Timer(self)
         self.timer.Start(100)
         self.overlay=wx.Overlay()
@@ -68,7 +69,7 @@ class ImageWindow(wx.ScrolledWindow):
             pdc = wx.GCDC(dc)
             pdc.SetBrush(brush)
             pdc.DrawRectangle(x, 0, width, height)
-        dc.SetPen(wx.Pen('white',1))
+        dc.SetPen(wx.Pen('yellow',1))
         dc.DrawLine(-self.CalcScrolledPosition(0,0)[0] + 150, 0, -self.CalcScrolledPosition(0,0)[0] + 150, 150)
         dc.SetPen(wx.Pen('green',1))
         dc.DrawLine(self.CurrPos, 0, self.CurrPos, 150)
@@ -99,10 +100,15 @@ class ImageWindow(wx.ScrolledWindow):
         self.RightClickFlag = 1
         self.ORiX=event.X - self.CalcScrolledPosition(0,0)[0]
         self.RiX = self.ORiX
+        self.Startr = self.RiX
         self.Refresh()
         event.Skip()
 
-
+    def OnRightUp(self, event):
+        self.Endr = event.X - self.CalcScrolledPosition(0,0)[0]
+        if self.Endr != self.Startr:
+            self.Scroll(-self.CalcScrolledPosition(0,0)[0] + self.Endr - self.Startr, 0)
+        event.Skip()
 
 class SimFrame(wx.Frame):
 
@@ -116,9 +122,19 @@ class SpecPanel(wx.Panel):
     def __init__(self,parent):
 
         wx.Panel.__init__(self,parent,-1)
-        self.specW=self.OpenData(self)
-        #self.orim = Image.fromarray(specW)
-        self.spec = self.specW*255.0
+
+        #IF THE SPEC_FLAG IS TRUE, SHOW THE SPEC, OTHERWISE DISPLAY THE EXAMPLE
+        self.Spec_Flag = self.DisplaySpec(self)
+
+        if self.Spec_Flag == 1:
+            self.specW=self.OpenData(self)
+            #self.orim = Image.fromarray(specW)
+            self.spec = self.specW*255.0
+            
+            self.orim = wx.ImageFromBuffer(int(np.size(self.spec , axis = 1)), int(np.size(self.spec, axis = 0)), np.uint8(self.spec))
+            self.orim = self.orim.Rescale(self.orim.GetWidth(), 140)
+        else:
+            self.orim = wx.Image('../Icons/speceg.jpg', wx.BITMAP_TYPE_JPEG)
         #SET THE DEFAULT VALUE OF THE SLIDER POS
         self.pos = 200
 
@@ -150,14 +166,7 @@ class SpecPanel(wx.Panel):
         self.textright = wx.TextCtrl(panel, id=4, pos=(115, 70), size=(70, 25))
         self.textmid = wx.TextCtrl(panel, id=5, pos=(115, 100), size=(70,25))
         self.textcurr = wx.TextCtrl(panel, id=6, pos=(115, 130), size=(70,25))
-
-        #IF THE SPEC_FLAG IS TRUE, SHOW THE SPEC, OTHERWISE DISPLAY THE EXAMPLE
-        self.Spec_Flag = self.DisplaySpec(self)
-        if self.Spec_Flag == 1:
-            self.orim = wx.ImageFromBuffer(int(np.size(self.spec , axis = 1)), int(np.size(self.spec, axis = 0)), np.uint8(self.spec))
-            self.orim = self.orim.Rescale(self.orim.GetWidth(), 140)
-        else:
-            self.orim = wx.Image('../Icons/speceg.jpg', wx.BITMAP_TYPE_JPEG)
+            
         self.im = self.orim
         self.bm = self.im.ConvertToBitmap()
 
@@ -235,7 +244,7 @@ class SpecPanel(wx.Panel):
 
     def DisplaySpec(self, event):
         #RECEIVE A SIGNAL AS THE DISPLAY FLAG
-        Spec_Flag = 1
+        Spec_Flag = 0
         return Spec_Flag
     
     def sliderUpdate1(self, event):
@@ -251,10 +260,10 @@ class SpecPanel(wx.Panel):
         self.wind.SetBitmap(self.im.ConvertToBitmap())
         if self.wind.LeftClickFlag == 1:
             self.wind.LeX = self.wind.OLeX*self.pos/200.0
-            self.LeftText(self)
+            self.LeftText(event)
         if self.wind.RightClickFlag == 1:
             self.wind.RiX = self.wind.ORiX*self.pos/200.0
-            self.RightText(self)
+            self.RightText(event)
         self.wind.Refresh()
 
     def sliderUpdate2(self, event):
