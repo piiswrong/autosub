@@ -4,7 +4,7 @@ import wx.lib.platebtn as pbtn
 import wx.lib.stattext as stattext
 import sys
 import myvlc.vlc as vlc
-from spectrum_widget.SpecWin import *
+from spectrum_widget.imOnScrWin import *
 # import standard libraries
 import os
 import user
@@ -179,6 +179,8 @@ class MyFrame(wx.Frame):
                 self.Bind(wx.EVT_SLIDER, self.OnSetPlayTime, self.timeslider)
                 self.Bind(wx.EVT_BUTTON, self.OnToggleFullScreen, fullscreen)
                 self.Bind(wx.EVT_BUTTON, self.OnFeedBack, self.feedback)
+                self.Bind(wx.EVT_BUTTON, self.OnRight,right)
+                self.Bind(wx.EVT_BUTTON, self.OnLeft, left)
                 # Give a pretty layout to the controls                
                 ctrlbox=wx.GridBagSizer(vgap=0, hgap=0)
                 ctrlbox.Add(self.displaytime,(0,1))                
@@ -409,6 +411,14 @@ class MyFrame(wx.Frame):
         def OnFeedBack(self, evt):
                 feedbackdialog=FeedBackDialog(None,"FeedBack")
                 feedbackdialog.ShowModal()
+
+        def OnRight(self, evt):                
+                self.player.set_position(self.player.get_position()+0.03)
+                evt.Skip()
+        
+        def OnLeft(self, evt):
+                self.player.set_position(self.player.get_position()-0.03)
+                evt.Skip()
 
 
 class SelectDialog(wx.Dialog):
