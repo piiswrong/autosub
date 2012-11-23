@@ -23,32 +23,32 @@ class MyFrame(wx.Frame):
                 self.icon=wx.Icon('./VLC/Icons/autosub.ico',wx.wx.BITMAP_TYPE_ICO);
                 self.SetIcon(self.icon);
                 self.file_menu=wx.Menu()
-                self.file_menu.Append(1,"&Open \tCtrl+O")
+                menu_open=self.file_menu.Append(-1,"&Open \tCtrl+O")
                 self.file_menu.AppendSeparator()
-                self.file_menu.Append(2,"&Close \tCtrl+C")
-                self.Bind(wx.EVT_MENU, self.OnOpen, id=1)
-                self.Bind(wx.EVT_MENU, self.OnExit, id=2)
+                menu_close=self.file_menu.Append(-1,"&Close \tCtrl+C")
+                self.Bind(wx.EVT_MENU, self.OnOpen, menu_open)
+                self.Bind(wx.EVT_MENU, self.OnExit, menu_close)
                 self.frame_menubar.Append(self.file_menu, "&File")
 
 
                 #  Edit Menu
                 self.edit_menu=wx.Menu()
-                self.edit_menu.Append(3,"&Play \tCtrl+P")
+                menu_play=self.edit_menu.Append(-1,"&Play \tCtrl+P")
                 self.edit_menu.AppendSeparator()
-                self.edit_menu.Append(4,"P&ause \tCtrl+A")
+                menu_pause=self.edit_menu.Append(-1,"P&ause \tCtrl+A")
                 self.edit_menu.AppendSeparator()
-                self.edit_menu.Append(5,"&Stop \tCtrl+S")
+                menu_stop=self.edit_menu.Append(-1,"&Stop \tCtrl+S")
                 self.edit_menu.AppendSeparator()
-                self.edit_menu.Append(6,"&FullScreen \tCtrl+F")
+                menu_fullscreen=self.edit_menu.Append(-1,"&FullScreen \tCtrl+F")
                 self.edit_menu.AppendSeparator()
-                self.edit_menu.Append(7,"&Volume \tCtrl+V")
+                menu_volume=self.edit_menu.Append(-1,"&Volume \tCtrl+V")
                 self.edit_menu.AppendSeparator()
 
-                self.Bind(wx.EVT_MENU, self.OnPlay, id=3);
-                self.Bind(wx.EVT_MENU, self.OnPause, id=4);
-                self.Bind(wx.EVT_MENU, self.OnStop, id=5);
-                self.Bind(wx.EVT_MENU, self.OnToggleFullScreen, id=6);
-                self.Bind(wx.EVT_MENU, self.OnToggleVolume, id=7);
+                self.Bind(wx.EVT_MENU, self.OnPlay, menu_play);
+                self.Bind(wx.EVT_MENU, self.OnPause, menu_pause);
+                self.Bind(wx.EVT_MENU, self.OnStop, menu_stop);
+                self.Bind(wx.EVT_MENU, self.OnToggleFullScreen, menu_fullscreen);
+                self.Bind(wx.EVT_MENU, self.OnToggleVolume, menu_volume);
                 self.frame_menubar.Append(self.edit_menu, "&Edit")
 
                 #  Audio Menu
@@ -82,12 +82,14 @@ class MyFrame(wx.Frame):
                 self.frame_menubar.Append(self.view_menu, "View")
 
                 #  Help Menu
-                self.help_menu=wx.Menu()
-                self.help_menu.Append(-1,"NULL")
+                self.help_menu=wx.Menu()                
+                menu_feedback=self.help_menu.Append(-1,"&FeedBack")
                 self.help_menu.AppendSeparator()
                 self.help_menu.Append(-1,"NULL")
                 self.frame_menubar.Append(self.help_menu, "Help")
                 self.SetMenuBar(self.frame_menubar)
+                
+                self.Bind(wx.EVT_MENU, self.OnFeedBack, menu_feedback);
                 # common attributes in the screen
                 myfont=wx.Font(11, wx.SWISS, wx.NORMAL, wx.NORMAL,False, u'Segoe UI')
                 Backgroud=(57,59,66)
@@ -107,11 +109,11 @@ class MyFrame(wx.Frame):
                 ctrlpanel = wx.Panel(self, -1 )
 
                 #  timeslider
-                self.timeslider = wx.Slider(ctrlpanel, -1, 0, 0, 1000,size=(565,20)) #timeline
+                self.timeslider = wx.Slider(ctrlpanel, -1, 0, 0, 1000,size=(598,20)) #timeline
                 self.timeslider.SetRange(0, 1000)
                 self.timeslider.SetBackgroundColour(Backgroud)
                 #  buffergauge
-                self.buffergauge = wx.Gauge(ctrlpanel, -1,1000,size=(560,5)) 
+                self.buffergauge = wx.Gauge(ctrlpanel, -1,1000,size=(590,5)) 
                 self.buffergauge.SetRange(1000)
                 self.buffergauge.SetBackgroundColour(Backgroud)
                 #  display time                                                                          
@@ -159,15 +161,9 @@ class MyFrame(wx.Frame):
                 left.SetSize(size=(20,20))
                 left.SetBitmap(bmp=leftbmp)
                 #  voice slider
-                self.volslider = wx.Slider(ctrlpanel, -1, 0, 0, 100, size=(90, -1))
+                self.volslider = wx.Slider(ctrlpanel, -1, 0, 0, 100, size=(83, -1))
                 self.volslider.SetBackgroundColour(Backgroud)
-                #  feedback button
-                self.feedback=pbtn.PlateButton(ctrlpanel)
-                self.feedback.SetBackgroundColour(Backgroud)
-                feedbackbmp=wx.Bitmap("./VLC/Icons/smile.gif",wx.BITMAP_TYPE_GIF)
-                feedbackbmp.SetSize(size=(15,15))
-                self.feedback.SetBitmap(bmp=feedbackbmp) 
-                
+                                
                 ''' this is the Subtitle Editor'''
                 # pos=wx.Frame.GetPosition();                
                 """Bind Control to Events"""
@@ -177,8 +173,7 @@ class MyFrame(wx.Frame):
                 self.Bind(wx.EVT_BUTTON, self.OnToggleVolume, self.volume)
                 self.Bind(wx.EVT_SLIDER, self.OnSetVolume, self.volslider)
                 self.Bind(wx.EVT_SLIDER, self.OnSetPlayTime, self.timeslider)
-                self.Bind(wx.EVT_BUTTON, self.OnToggleFullScreen, fullscreen)
-                self.Bind(wx.EVT_BUTTON, self.OnFeedBack, self.feedback)
+                self.Bind(wx.EVT_BUTTON, self.OnToggleFullScreen, fullscreen)                
                 self.Bind(wx.EVT_BUTTON, self.OnRight,right)
                 self.Bind(wx.EVT_BUTTON, self.OnLeft, left)
                 # Give a pretty layout to the controls                
@@ -187,13 +182,12 @@ class MyFrame(wx.Frame):
                 ctrlbox.Add(self.volume,(0,8))                
                 ctrlbox.Add(self.volslider,(0,9))
                 ctrlbox.Add(self.timeslider,(1,0),span=(1,10))
-                ctrlbox.Add(self.buffergauge,(2,0),span=(1,10))
-                ctrlbox.Add(self.feedback,(3,0),flag=wx.ALIGN_BOTTOM)
-                ctrlbox.Add(left,(3,5))
-                ctrlbox.Add(play,(3,6))
-                ctrlbox.Add(pause,(3,8))
-                ctrlbox.Add(right,(3,7))
-                ctrlbox.Add(fullscreen,(3,9),flag=wx.ALIGN_BOTTOM|wx.ALIGN_RIGHT)
+                ctrlbox.Add(self.buffergauge,(2,0),span=(1,10))                
+                ctrlbox.Add(left,(4,5))
+                ctrlbox.Add(play,(4,6))
+                ctrlbox.Add(pause,(4,8))
+                ctrlbox.Add(right,(4,7))
+                ctrlbox.Add(fullscreen,(4,9),flag=wx.ALIGN_BOTTOM|wx.ALIGN_RIGHT)
                 ctrlpanel.SetSizer(ctrlbox)
                 # Put everything togheter
                 sizer = wx.BoxSizer(wx.VERTICAL)
@@ -225,10 +219,10 @@ class MyFrame(wx.Frame):
 
 
                 
-                BigSizer.SetMinSize((980, 450))
+                BigSizer.SetMinSize((1010, 450))
 
                 self.SetSizer(BigSizer)
-                self.SetMinSize((980, 450))
+                self.SetMinSize((1010, 450))
 
                 # finally create the timer, which updates the timeslider
                 self.timer = wx.Timer(self)
