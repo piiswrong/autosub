@@ -370,8 +370,15 @@ class MyFrame(wx.Frame):
                 """Mute/Unmute according to the audio button.
                 """
                 is_mute = self.player.audio_get_mute()
-
                 self.player.audio_set_mute(not is_mute)
+                if is_mute==True:
+                        mutebmp=wx.Bitmap("./VLC/Icons/volume.png",wx.BITMAP_TYPE_PNG)
+                        self.volume.SetSize((20,20))
+                        self.volume.SetBitmap(bmp=mutebmp)
+                else:
+                        notmutebmp=wx.Bitmap("./VLC/Icons/no_volume.png",wx.BITMAP_TYPE_PNG)
+                        self.volume.SetSize((20,20))
+                        self.volume.SetBitmap(bmp=notmutebmp)
                 # update the volume slider;
                 # since vlc volume range is in [0, 200],
                 # and our volume slider has range [0, 100], just divide by 2.
