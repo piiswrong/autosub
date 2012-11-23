@@ -156,8 +156,13 @@ class SpecPanel(wx.Panel):
         self.textmid = wx.TextCtrl(panel, id=5, pos=(115, 100), size=(70,25))
         self.textcurr = wx.TextCtrl(panel, id=6, pos=(115, 130), size=(70,25))
 
-        self.orim = wx.ImageFromBuffer(int(np.size(self.spec , axis = 1)), int(np.size(self.spec, axis = 0)), np.uint8(self.spec))
-        self.orim = self.orim.Rescale(self.orim.GetWidth(), 140)
+        #IF THE SPEC_FLAG IS TRUE, SHOW THE SPEC, OTHERWISE DISPLAY THE EXAMPLE
+        self.Spec_Flag = self.DisplaySpec(self)
+        if self.Spec_Flag == 1:
+            self.orim = wx.ImageFromBuffer(int(np.size(self.spec , axis = 1)), int(np.size(self.spec, axis = 0)), np.uint8(self.spec))
+            self.orim = self.orim.Rescale(self.orim.GetWidth(), 140)
+        else:
+            self.orim = wx.Image('../Icons/speceg.jpg', wx.BITMAP_TYPE_JPEG)
         self.im = self.orim
         self.bm = self.im.ConvertToBitmap()
 
@@ -230,6 +235,12 @@ class SpecPanel(wx.Panel):
                 list.append(vector)
             Num = Num + 1
         return specW
+
+
+    def DisplaySpec(self, event):
+        #RECEIVE A SIGNAL AS THE DISPLAY FLAG
+        Spec_Flag = 0
+        return Spec_Flag
     
     def sliderUpdate1(self, event):
         self.pos = self.sld.GetValue()
