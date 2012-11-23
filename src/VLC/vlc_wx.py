@@ -1,6 +1,7 @@
 # import external libraries
 import wx # 2.8
 import wx.lib.platebtn as pbtn
+import wx.lib.stattext as stattext
 import sys
 import myvlc.vlc as vlc
 from spectrum_widget.imOnScrWin import *
@@ -106,16 +107,17 @@ class MyFrame(wx.Frame):
                 ctrlpanel = wx.Panel(self, -1 )
 
                 #  timeslider
-                self.timeslider = wx.Slider(ctrlpanel, -1, 0, 0, 1000,size=(500,20)) #timeline
+                self.timeslider = wx.Slider(ctrlpanel, -1, 0, 0, 1000,size=(565,20)) #timeline
                 self.timeslider.SetRange(0, 1000)
                 self.timeslider.SetBackgroundColour(Backgroud)
                 #  buffergauge
-                self.buffergauge = wx.Gauge(ctrlpanel, -1,1000,size=(495,5)) 
+                self.buffergauge = wx.Gauge(ctrlpanel, -1,1000,size=(560,5)) 
                 self.buffergauge.SetRange(1000)
                 self.buffergauge.SetBackgroundColour(Backgroud)
                 #  display time                                                                          
-                self.displaytime=wx.StaticText(ctrlpanel, -1, "00:00/00:00")
-                self.displaytime.SetBackgroundColour(Backgroud)                
+                self.displaytime=stattext.GenStaticText(ctrlpanel, -1, "00:00/00:00",style=wx.ALIGN_RIGHT)
+                self.displaytime.SetBackgroundColour(Backgroud)
+                self.displaytime.SetFont(myfont)
 
                 #  pause button
                 pause  = pbtn.PlateButton(ctrlpanel)
@@ -177,9 +179,11 @@ class MyFrame(wx.Frame):
                 self.Bind(wx.EVT_SLIDER, self.OnSetPlayTime, self.timeslider)
                 self.Bind(wx.EVT_BUTTON, self.OnToggleFullScreen, fullscreen)
                 self.Bind(wx.EVT_BUTTON, self.OnFeedBack, self.feedback)
+                self.Bind(wx.EVT_BUTTON, self.OnRight,right)
+                self.Bind(wx.EVT_BUTTON, self.OnLeft, left)
                 # Give a pretty layout to the controls                
                 ctrlbox=wx.GridBagSizer(vgap=0, hgap=0)
-                ctrlbox.Add(self.displaytime,(0,0),(1,2))                
+                ctrlbox.Add(self.displaytime,(0,1))                
                 ctrlbox.Add(self.volume,(0,8))                
                 ctrlbox.Add(self.volslider,(0,9))
                 ctrlbox.Add(self.timeslider,(1,0),span=(1,10))
@@ -199,9 +203,9 @@ class MyFrame(wx.Frame):
                 
                 sizer.Add(self.videopanel, 1, flag=wx.EXPAND)
                 sizer.Add(ctrlpanel, flag=wx.EXPAND | wx.BOTTOM | wx.TOP, border=10)
-                sizer.SetMinSize((420, 450))
+                sizer.SetMinSize((400, 450))
                 subsizer=wx.BoxSizer(wx.VERTICAL);
-                subsizer.SetMinSize((420,450));
+                subsizer.SetMinSize((400,450));
 
                 subpanel=Subtitle(self,-1);
                 self.Bind(wx.EVT_MENU, subpanel.OpenFile, op);
@@ -221,10 +225,10 @@ class MyFrame(wx.Frame):
 
 
                 
-                BigSizer.SetMinSize((950, 450))
+                BigSizer.SetMinSize((980, 450))
 
                 self.SetSizer(BigSizer)
-                self.SetMinSize((950, 450))
+                self.SetMinSize((980, 450))
 
                 # finally create the timer, which updates the timeslider
                 self.timer = wx.Timer(self)
@@ -366,8 +370,15 @@ class MyFrame(wx.Frame):
                 """Mute/Unmute according to the audio button.
                 """
                 is_mute = self.player.audio_get_mute()
-
                 self.player.audio_set_mute(not is_mute)
+                if is_mute==True:
+                        mutebmp=wx.Bitmap("./VLC/Icons/volume.png",wx.BITMAP_TYPE_PNG)
+                        self.volume.SetSize((20,20))
+                        self.volume.SetBitmap(bmp=mutebmp)
+                else:
+                        notmutebmp=wx.Bitmap("./VLC/Icons/no_volume.png",wx.BITMAP_TYPE_PNG)
+                        self.volume.SetSize((20,20))
+                        self.volume.SetBitmap(bmp=notmutebmp)
                 # update the volume slider;
                 # since vlc volume range is in [0, 200],
                 # and our volume slider has range [0, 100], just divide by 2.
@@ -407,6 +418,14 @@ class MyFrame(wx.Frame):
         def OnFeedBack(self, evt):
                 feedbackdialog=FeedBackDialog(None,"FeedBack")
                 feedbackdialog.ShowModal()
+
+        def OnRight(self, evt):                
+                self.player.set_position(self.player.get_position()+0.03)
+                evt.Skip()
+        
+        def OnLeft(self, evt):
+                self.player.set_position(self.player.get_position()-0.03)
+                evt.Skip()
 
 
 class SelectDialog(wx.Dialog):
