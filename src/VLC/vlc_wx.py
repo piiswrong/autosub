@@ -8,7 +8,7 @@ from spectrum_widget.imOnScrWin import *
 # import standard libraries
 import os
 import user
-from subtitle_widget.SubtitleEditor import * 
+from subtitle_widget.SubtitleEditor import *
 
 class MyFrame(wx.Frame):
         """The main window
@@ -107,69 +107,56 @@ class MyFrame(wx.Frame):
 
                 # The second panel holds controls
                 ctrlpanel = wx.Panel(self, -1 )
+                ctrlpanel.SetBackgroundColour(Backgroud)
 
                 #  timeslider
                 self.timeslider = wx.Slider(ctrlpanel, -1, 0, 0, 1000,size=(598,20)) #timeline
                 self.timeslider.SetRange(0, 1000)
-                self.timeslider.SetBackgroundColour(Backgroud)
+                
                 #  buffergauge
                 self.buffergauge = wx.Gauge(ctrlpanel, -1,1000,size=(590,5)) 
                 self.buffergauge.SetRange(1000)
-                self.buffergauge.SetBackgroundColour(Backgroud)
+                
                 #  display time                                                                          
-                self.displaytime=stattext.GenStaticText(ctrlpanel, -1, "00:00/00:00",style=wx.ALIGN_RIGHT)
-                self.displaytime.SetBackgroundColour(Backgroud)
+                self.displaytime=stattext.GenStaticText(ctrlpanel, -1, "00:00/00:00",style=wx.ALIGN_RIGHT)                
                 self.displaytime.SetFont(myfont)
 
-                #  pause button
-                pause  = pbtn.PlateButton(ctrlpanel)
-                pause.SetBackgroundColour(Backgroud)
-                pausebmp=wx.Bitmap("./VLC/Icons/pause.png",wx.BITMAP_TYPE_PNG)
-                pausebmp.SetSize(size=(35,35))
-                pause.SetBitmap(bmp=pausebmp)
+                #  pause button                              
+                self.pausebmp=wx.Bitmap("./VLC/Icons/pause.png",wx.BITMAP_TYPE_PNG)
+                self.pausebmp.SetSize(size=(40,40))                
                 #  play button
-                play   = pbtn.PlateButton(ctrlpanel)
-                play.SetBackgroundColour(Backgroud)
-                playbmp=wx.Bitmap("./VLC/Icons/play.png",wx.BITMAP_TYPE_PNG)
-                playbmp.SetSize(size=(40,40))
-                play.SetBitmap(bmp=playbmp)
-                #  stop button
-                #stop   = pbtn.PlateButton(ctrlpanel, label="Stop")
-                #stop.SetBackgroundColour(Backgroud)
+                self.playbmp=wx.Bitmap("./VLC/Icons/play.png",wx.BITMAP_TYPE_PNG)                
+                self.playbmp.SetSize(size=(40,40))                
+                self.play   = pbtn.PlateButton(ctrlpanel)                            
+                self.play.SetBitmap(bmp=self.playbmp)                             
+                
                 #  volume button
-                self.volume = pbtn.PlateButton(ctrlpanel)
-                self.volume.SetBackgroundColour(Backgroud)
+                self.volume = pbtn.PlateButton(ctrlpanel)                
                 volumebmp=wx.Bitmap("./VLC/Icons/volume.png",wx.BITMAP_TYPE_PNG)
                 self.volume.SetSize((20,20))
                 self.volume.SetBitmap(bmp=volumebmp)
                 #  fullscreen button
-                fullscreen = pbtn.PlateButton(ctrlpanel)
-                fullscreen.SetBackgroundColour(Backgroud)
+                fullscreen = pbtn.PlateButton(ctrlpanel)                
                 fullscreenbmp=wx.Bitmap("./VLC/Icons/fullscreen.png", wx.BITMAP_TYPE_PNG)
                 fullscreen.SetSize(size=(20,20))
                 fullscreen.SetBitmap(bmp=fullscreenbmp)
                 #  right button
-                right=pbtn.PlateButton(ctrlpanel)
-                right.SetBackgroundColour(Backgroud)
+                right=pbtn.PlateButton(ctrlpanel)                
                 rightbmp=wx.Bitmap("./VLC/Icons/right.png",wx.BITMAP_TYPE_PNG)
                 right.SetSize(size=(20,20))
                 right.SetBitmap(bmp=rightbmp)
                 #  left button
-                left=pbtn.PlateButton(ctrlpanel)
-                left.SetBackgroundColour(Backgroud)
+                left=pbtn.PlateButton(ctrlpanel)                
                 leftbmp=wx.Bitmap("./VLC/Icons/left.png",wx.BITMAP_TYPE_PNG)
                 left.SetSize(size=(20,20))
                 left.SetBitmap(bmp=leftbmp)
                 #  voice slider
-                self.volslider = wx.Slider(ctrlpanel, -1, 0, 0, 100, size=(83, -1))
-                self.volslider.SetBackgroundColour(Backgroud)
+                self.volslider = wx.Slider(ctrlpanel, -1, 0, 0, 100, size=(83, -1))               
                                 
                 ''' this is the Subtitle Editor'''
                 # pos=wx.Frame.GetPosition();                
                 """Bind Control to Events"""
-                self.Bind(wx.EVT_BUTTON, self.OnPlay, play)
-                self.Bind(wx.EVT_BUTTON, self.OnPause, pause)
-                #self.Bind(wx.EVT_BUTTON, self.OnStop, stop)
+                self.Bind(wx.EVT_BUTTON, self.OnPlayButton, self.play)                          
                 self.Bind(wx.EVT_BUTTON, self.OnToggleVolume, self.volume)
                 self.Bind(wx.EVT_SLIDER, self.OnSetVolume, self.volslider)
                 self.Bind(wx.EVT_SLIDER, self.OnSetPlayTime, self.timeslider)
@@ -184,8 +171,7 @@ class MyFrame(wx.Frame):
                 ctrlbox.Add(self.timeslider,(1,0),span=(1,10))
                 ctrlbox.Add(self.buffergauge,(2,0),span=(1,10))                
                 ctrlbox.Add(left,(4,5))
-                ctrlbox.Add(play,(4,6))
-                ctrlbox.Add(pause,(4,8))
+                ctrlbox.Add(self.play,(4,6))               
                 ctrlbox.Add(right,(4,7))
                 ctrlbox.Add(fullscreen,(4,9),flag=wx.ALIGN_BOTTOM|wx.ALIGN_RIGHT)
                 ctrlpanel.SetSizer(ctrlbox)
@@ -303,7 +289,17 @@ class MyFrame(wx.Frame):
                                 self.errorDialog("Unable to play.")
                         else:
                                 self.timer.Start(100)
+
+        def OnPlayButton(self,evt):
+                if not self.player.get_media():
+                        self.OnOpen(None)
+                else:
+                        self.OnPause(self)
+                        if self.player.is_playing()==True:                                                           
+                                self.play.SetBitmap(bmp=self.pausebmp)
                                 
+                        else:                                
+                                self.play.SetBitmap(bmp=self.playbmp)                                
 
         def OnPause(self, evt):
                 """Pause the player.
@@ -504,5 +500,75 @@ class FeedBackDialog(wx.Dialog):
                 return self.mail.GetValue()
         def GetSuggestion(self):
                 return self.suggestion.GetValue()
+
+class ShapedButton(wx.PyControl):
+    def __init__(self, parent, normal, pressed=None, disabled=None):
+        super(ShapedButton, self).__init__(parent, -1, style=wx.BORDER_NONE)
+        self.normal = normal
+        self.pressed = pressed
+        self.disabled = disabled
+        self.region = wx.RegionFromBitmapColour(normal, wx.Color(0, 0, 0, 0))
+        self._clicked = False
+        self.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)
+        self.Bind(wx.EVT_SIZE, self.on_size)
+        self.Bind(wx.EVT_PAINT, self.on_paint)
+        self.Bind(wx.EVT_LEFT_DOWN, self.on_left_down)
+        self.Bind(wx.EVT_LEFT_DCLICK, self.on_left_dclick)
+        self.Bind(wx.EVT_LEFT_UP, self.on_left_up)
+        self.Bind(wx.EVT_MOTION, self.on_motion)
+        self.Bind(wx.EVT_LEAVE_WINDOW, self.on_leave_window)
+    def DoGetBestSize(self):
+        return self.normal.GetSize()
+    def Enable(self, *args, **kwargs):
+        super(ShapedButton, self).Enable(*args, **kwargs)
+        self.Refresh()
+    def Disable(self, *args, **kwargs):
+        super(ShapedButton, self).Disable(*args, **kwargs)
+        self.Refresh()
+    def post_event(self):
+        event = wx.CommandEvent()
+        event.SetEventObject(self)
+        event.SetEventType(wx.EVT_BUTTON.typeId)
+        wx.PostEvent(self, event)
+    def on_size(self, event):
+        event.Skip()
+        self.Refresh()
+    def on_paint(self, event):
+        dc = wx.AutoBufferedPaintDC(self)
+        dc.SetBackground(wx.Brush(self.GetParent().GetBackgroundColour()))
+        dc.Clear()
+        bitmap = self.normal
+        if self.clicked:
+            bitmap = self.pressed or bitmap
+        if not self.IsEnabled():
+            bitmap = self.disabled or bitmap
+        dc.DrawBitmap(bitmap, 0, 0)
+    def set_clicked(self, clicked):
+        if clicked != self._clicked:
+            self._clicked = clicked
+            self.Refresh()
+    def get_clicked(self):
+        return self._clicked
+    clicked = property(get_clicked, set_clicked)
+    def on_left_down(self, event):
+        x, y = event.GetPosition()
+        if self.region.Contains(x, y):
+            self.clicked = True
+    def on_left_dclick(self, event):
+        self.on_left_down(event)
+    def on_left_up(self, event):
+        if self.clicked:
+            x, y = event.GetPosition()
+            if self.region.Contains(x, y):
+                self.post_event()
+        self.clicked = False
+    def on_motion(self, event):
+        if self.clicked:
+            x, y = event.GetPosition()
+            if not self.region.Contains(x, y):
+                self.clicked = False
+    def on_leave_window(self, event):
+        self.clicked = False
+
 
 
