@@ -107,7 +107,8 @@ class MyFrame(wx.Frame):
 
                 # The second panel holds controls
                 ctrlpanel = wx.Panel(self, -1 )
-                ctrlpanel.SetBackgroundColour(Backgroud)
+                ctrlpanelcolor=(51,51,51)
+                ctrlpanel.SetBackgroundColour(ctrlpanelcolor)
 
                 #  timeslider
                 self.timeslider = wx.Slider(ctrlpanel, -1, 0, 0, 1000,size=(598,20)) #timeline
