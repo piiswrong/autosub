@@ -194,19 +194,17 @@ class MyFrame(wx.Frame):
                 
                 splitter = wx.SplitterWindow(self, -1, style=wx.SP_LIVE_UPDATE)
                 
-                Spec=SpecPanel(self,"VLC/spectrum_widget/Icon/speceg.jpg")
-                Spec.SetMinSize((500,200))
-                Spec.SetBackgroundColour(Backgroud)
+                self.Spec=SpecPanel(self,"VLC/spectrum_widget/Icon/speceg.jpg")
+                self.Spec.SetMinSize((500,200))
+                self.Spec.SetBackgroundColour(Backgroud)
                 
                 SizerPart1.Add(self.subpanel,flag=wx.EXPAND)
                 #SizerPart1.Add(splitter2,flag=wx.EXPAND)
-                SizerPart1.Add(Spec,flag=wx.EXPAND)
+                SizerPart1.Add(self.Spec,flag=wx.EXPAND)
                 SizerPart1.SetMinSize((500,650))
-                BigSizer.Add(SizerPart1,flag=wx.EXPAND)
-                #BigSizer.Add(self.subpanel,flag=wx.EXPAND)
+                BigSizer.Add(SizerPart1,flag=wx.EXPAND)                
                 BigSizer.Add(splitter,flag=wx.EXPAND)               
-                BigSizer.Add(sizer,flag=wx.EXPAND)
-                #BigSizer.Add(Spec,flag=wx.EXPAND)
+                BigSizer.Add(sizer,flag=wx.EXPAND)                
                 BigSizer.SetMinSize((1120,650))
                 self.SetSizer(BigSizer)
                 self.SetMinSize((1120,650))
@@ -273,6 +271,7 @@ class MyFrame(wx.Frame):
                         self.select_dialog.ShowModal()
                         # Finally Play~FIXME: this should be made cross-platform
                         self.OnPlay(None)
+                        self.Spec.GetAddr(self.Spec,self.mediapath)
                 else:
                         dlg.Destroy()
 
@@ -332,6 +331,11 @@ class MyFrame(wx.Frame):
                 # update the time on the slider
                 time = self.player.get_time()
                 self.timeslider.SetValue(time)
+
+                # give the time to spec
+                self.Spec.CurrPos(self.Spec,time)
+
+                
 
                 # update the displaytime 
                 second=time/1000
