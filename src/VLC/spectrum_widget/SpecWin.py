@@ -175,7 +175,7 @@ class SpecPanel(wx.Panel):
         self.wind.Bind(wx.EVT_RIGHT_UP, self.RightText)
         self.wind.Bind(wx.EVT_SCROLLWIN, self.MidText)
         self.sld1.Bind(wx.EVT_SLIDER, self.sliderUpdate2)
-        self.wind.Bind(wx.EVT_TIMER, self.CurrText, self.wind.timer)
+        #self.wind.Bind(wx.EVT_TIMER, self.CurrText, self.wind.timer)
         self.wind.Bind(wx.EVT_TIMER, self.OnTimer, self.wind.timer)
         self.wind.FitInside()
         #self.wind.SetScrollbars(1,0, self.im.GetWidth(), 200)
@@ -233,6 +233,9 @@ class SpecPanel(wx.Panel):
                 list.append(vector)
             Num = Num + 1
         return specW
+
+    def GetAddr(self, event, path):
+        self.addr = path
     
     def GetData(self,event):
 
@@ -298,28 +301,34 @@ class SpecPanel(wx.Panel):
         self.textleft.Clear()
         if self.wind.LeftClickFlag ==1:
             time = self.wind.LeX/self.ratio/self.pos*200
-            self.textleft.WriteText(str(int(time/60/60))+":"+str(int(time/60))+":"+str(int(time%60)) + ":"+str(int(((round(time, 2) - int(time))*100))))
+            self.textleft.WriteText(str(int(time/60/60))+":"+str(int(time/60%60))+":"+str(int(time%60)) + ":"+str(int(((round(time, 2) - int(time))*100))))
         event.Skip()
 
     def RightText(self, event):
         self.textright.Clear()
         if self.wind.RightClickFlag==1:
             time = self.wind.RiX/self.ratio/self.pos*200
-            self.textright.WriteText(str(int(time/60/60))+":"+str(int(time/60))+":"+str(int(time%60)) + ":"+str(int(((round(time, 2) - int(time))*100))))
+            self.textright.WriteText(str(int(time/60/60))+":"+str(int(time/60%60))+":"+str(int(time%60)) + ":"+str(int(((round(time, 2) - int(time))*100))))
         event.Skip()
 
     def MidText(self, event):
         self.textmid.Clear()
         time = (-self.wind.CalcScrolledPosition(0,0)[0] + 150)/self.ratio*200.0/self.pos
-        self.textmid.WriteText(str(int(time/60/60))+":"+str(int(time/60))+":"+str(int(time%60))+ ":"+str(int(((round(time, 2) - int(time))*100))))
+        self.textmid.WriteText(str(int(time/60/60))+":"+str(int(time/60%60))+":"+str(int(time%60))+ ":"+str(int(((round(time, 2) - int(time))*100))))
         self.currx = -self.wind.CalcScrolledPosition(0,0)[0]
         event.Skip()
 
-    def CurrText(self, event):
+    """def CurrText(self, event):
         self.textcurr.Clear()
         time = (self.wind.CurrPos) * 200.0/self.pos/self.ratio
-        self.textcurr.WriteText(str(int(time/60/60))+":"+str(int(time/60))+":"+str(int(time%60))+ ":"+str(int(((round(time, 2) - int(time))*100))))
-        event.Skip()
+        self.textcurr.WriteText(str(int(time/60/60))+":"+str(int(time/60%60))+":"+str(int(time%60))+ ":"+str(int(((round(time, 2) - int(time))*100))))
+        event.Skip()"""
+
+    def CurrPos(self, event, milisec):
+        self.textcurr.Clear()
+        time = milisec
+        self.textcurr.WriteText(str(int(time/1000/60/60)) +":" +str(int(time/1000/60%60)) + ":" +str(int(time/1000%60)) +":" +str(int(time%1000)))
+        
 
     def OnTimer(self, event):
         self.wind.CurrPos = self.wind.CurrPos + 1.5
