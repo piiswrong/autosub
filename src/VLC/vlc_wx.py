@@ -95,7 +95,7 @@ class MyFrame(wx.Frame):
                 Backgroud=(57,59,66)
                 Fontcolor=(229,229,229)
                 bback=(77,77,77);
-                self.SetBackgroundColour(Backgroud)
+                #self.SetBackgroundColour(Backgroud)
  
                 #Panels
                 # This is the subtitlepanel
@@ -107,7 +107,8 @@ class MyFrame(wx.Frame):
 
                 # The second panel holds controls
                 ctrlpanel = wx.Panel(self, -1 )
-                ctrlpanel.SetBackgroundColour(Backgroud)
+                ctrlpanelcolor=(51,51,51)
+                ctrlpanel.SetBackgroundColour(ctrlpanelcolor)
 
                 #  timeslider
                 self.timeslider = wx.Slider(ctrlpanel, -1, 0, 0, 1000,size=(598,20)) #timeline
@@ -177,44 +178,37 @@ class MyFrame(wx.Frame):
                 ctrlpanel.SetSizer(ctrlbox)
                 # Put everything togheter
                 sizer = wx.BoxSizer(wx.VERTICAL)
-
-
-                BigSizer = wx.BoxSizer(wx.HORIZONTAL)
-                
                 sizer.Add(self.videopanel, 1, flag=wx.EXPAND)
                 sizer.Add(ctrlpanel, flag=wx.EXPAND | wx.BOTTOM | wx.TOP, border=10)
                 sizer.SetMinSize((400, 450))
-                subsizer=wx.BoxSizer(wx.VERTICAL);
-                subsizer.SetMinSize((400,450));
-                #####################################Subtitle Panel###################################
-                self.subpanel=Subtitle(self,-1);
-                self.Bind(wx.EVT_MENU, self.subpanel.OpenFile, op);
-                self.Bind(wx.EVT_MENU, self.subpanel.SaveFile, sa);
-                self.subpanel.SetSizer(subsizer);
-                ####################################CUTTING LINE######################################
+                
+                BigSizer = wx.BoxSizer(wx.HORIZONTAL)
+
+                SizerPart1=wx.BoxSizer(wx.VERTICAL)
+                
+                self.subpanel=Subtitle(self,-1)
+                self.Bind(wx.EVT_MENU, self.subpanel.OpenFile, op)
+                self.Bind(wx.EVT_MENU, self.subpanel.SaveFile, sa)
+                self.subpanel.SetMinSize((400,400))
+                self.subpanel.SetMaxSize((400,400))
                 
                 splitter = wx.SplitterWindow(self, -1, style=wx.SP_LIVE_UPDATE)
-
-                # subpanelf=wx.Panel(self,-1);
-                # BigSizer.Add(subpanelf,flag=wx.EXPAND|wx.RIGHT);
-                ####################################END Here##########################################
                 
-                BigSizer.Add(self.subpanel,flag=wx.EXPAND);
-                BigSizer.Add(splitter,flag=wx.EXPAND)
-                BigSizer.Add(sizer,flag=wx.EXPAND|wx.RIGHT)
-                #######################################SpectrumPanel##################################
-                Spec=SpecPanel(self,"VLC/spectrum_widget/Icon/speceg.jpg");
-                specsizer=wx.BoxSizer(wx.VERTICAL)
-                Spec.SetSizer(specsizer);
-                specsizer.SetMinSize((400,300))
-                BigSizer.Add(specsizer,flag=wx.EXPAND)
-
-                ####################################################################################
-                BigSizer.SetMinSize((1510, 450))
-
+                self.Spec=SpecPanel(self,"VLC/spectrum_widget/Icon/speceg.jpg")
+                self.Spec.SetMinSize((500,200))
+                self.Spec.SetBackgroundColour(Backgroud)
+                
+                SizerPart1.Add(self.subpanel,flag=wx.EXPAND)
+                #SizerPart1.Add(splitter2,flag=wx.EXPAND)
+                SizerPart1.Add(self.Spec,flag=wx.EXPAND)
+                SizerPart1.SetMinSize((500,650))
+                BigSizer.Add(SizerPart1,flag=wx.EXPAND)                
+                BigSizer.Add(splitter,flag=wx.EXPAND)               
+                BigSizer.Add(sizer,flag=wx.EXPAND)                
+                BigSizer.SetMinSize((1120,650))
                 self.SetSizer(BigSizer)
-                self.SetMinSize((1510, 450))
-
+                self.SetMinSize((1120,650))
+                
                 # finally create the timer, which updates the timeslider
                 self.timer = wx.Timer(self)
                 self.Bind(wx.EVT_TIMER, self.OnTimer, self.timer)
@@ -228,6 +222,7 @@ class MyFrame(wx.Frame):
                 # Set the Fast Key
                 acceltbl=wx.AcceleratorTable([(wx.ACCEL_CTRL,ord('O'),1),(wx.ACCEL_CTRL,ord('C'),2),(wx.ACCEL_CTRL,ord('P'),3),(wx.ACCEL_CTRL,ord('A'),4),(wx.ACCEL_CTRL,ord('S'),5),(wx.ACCEL_CTRL,ord('F'),6),(wx.ACCEL_CTRL,ord('V'),7)])
                 self.SetAcceleratorTable(acceltbl)
+                
         def SetTheSpec(self,evt):
                 return 
 
@@ -276,6 +271,7 @@ class MyFrame(wx.Frame):
                         self.select_dialog.ShowModal()
                         # Finally Play~FIXME: this should be made cross-platform
                         self.OnPlay(None)
+                        self.Spec.GetAddr(self.Spec,self.mediapath)
                 else:
                         dlg.Destroy()
 
@@ -340,6 +336,12 @@ class MyFrame(wx.Frame):
                 second=time/1000
                 self.current_min=second/60
                 self.current_second=second-self.current_min*60
+
+                # give the time to spec
+                self.Spec.CurrPos(self.Spec,time)
+
+
+                
                 if self.current_min<10:
                         str_min="0"+str(self.current_min)
                 else:
