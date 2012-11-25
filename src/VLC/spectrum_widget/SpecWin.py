@@ -133,10 +133,10 @@ class SpecPanel(wx.Panel):
 
         self.ratio = 15.69565217391304
 
-        self.sld = wx.Slider(self.panel, value = 200, minValue = 150, maxValue =500,pos = (0,10),
+        self.sld = wx.Slider(self.panel, value = 200, minValue = 150, maxValue =500,pos = (0,20),
             size=(55, 150), style=wx.SL_VERTICAL | wx.SL_AUTOTICKS | wx.SL_LABELS, name='width')
         self.sld.SetTickFreq(20, 1)
-        self.sld1 = wx.Slider(self.panel, value = 200, minValue = 150, maxValue =500,pos = (55,10),
+        self.sld1 = wx.Slider(self.panel, value = 200, minValue = 150, maxValue =500,pos = (55,20),
             size=(55, 150), style=wx.SL_VERTICAL| wx.SL_AUTOTICKS | wx.SL_LABELS)
         self.sld1.SetTickFreq(20, 1)
 
@@ -182,12 +182,12 @@ class SpecPanel(wx.Panel):
 
 
         self.sizer = wx.BoxSizer (wx.HORIZONTAL)
-        self.sizer.Add(self.wind, 1, wx.EXPAND, 0)
+        self.sizer.Add(self.wind, 1,wx.ALIGN_CENTER,0)
+        self.wind.SetMinSize((300,150))
         self.sizer.Add(self.panel, wx.ALIGN_LEFT)
-        #sizer.SetSize((500,200))
-        #sizer.Add(self.ruler)
+        self.panel.SetMinSize((200,200))
         self.SetSizer(self.sizer)
-        self.SetSize((500,200))
+        self.SetMinSize((500,200))
         #self.Fit()
 
     def OpenData(self,event):
