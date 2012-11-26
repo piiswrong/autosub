@@ -273,7 +273,9 @@ class Subtitle(wx.Panel):
         # self.Bind(wx.EVT_MENU, self.SaveItem, saveitemb)
         # self.Bind(wx.EVT_MENU, self.OpenFile, openb)
         # self.Bind(wx.EVT_MENU, self.SaveFile, saveb)
-        self.Bind(wx.EVT_LISTBOX_DCLICK,self.ChooseOneItem,self.listBox);
+
+        #self.Bind(wx.EVT_LISTBOX_DCLICK,self.ChooseOneItem,self.listBox);
+
         # self.SetMenuBar(menubar)
         # statusbar=self.CreateStatusBar()
         self.listBox.SetBackgroundColour(Backgroud)
@@ -306,9 +308,9 @@ class Subtitle(wx.Panel):
 
         # self.num.SetValue(tmp[0])
         if(len(tmp)>1):
-            self.begintime.SetValue(tmp[1])
+            self.begintime.SetValue(tmp[1])            
         if(len(tmp)>3):
-            self.endtime.SetValue(tmp[3])
+            self.endtime.SetValue(tmp[3])                                   
         ct=0
         subti=""
         for i in tmp:
@@ -317,6 +319,7 @@ class Subtitle(wx.Panel):
             ct=ct+1;
         # print type(subti);
         self.TextCtrl.SetValue(subti)
+        
     def SaveFile(self,event):
         file_wildcard="All files(*.*)|*.*"
         dlg=wx.FileDialog(self,"Save subtitles",
@@ -371,10 +374,14 @@ class Subtitle(wx.Panel):
         dd=int(num)
 
         self.listBox.Delete(dd);
+    def SetLeft(self,event,lefttime):
+        self.begintime.SetValue(lefttime)
+    def SetRight(self,event,righttime):
+        self.endtime.SetValue(righttime)
     def AddSub(self,event,st,et,context):
         srt=' '+st+' -- '+et+' '+context;
-        ad=srt.decode('utf-8','ignore');
-        self.listBox.Append(ad);
+        #ad=srt.decode('utf-8','ignore');
+        self.listBox.Append(srt);
         
     def OpenTheFile(self,event,url):
         foot=url;

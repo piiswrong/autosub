@@ -60,32 +60,32 @@ class MyFrame(wx.Frame):
                 self.frame_menubar.Append(self.sub, "Subtitle")
 
                 #  Video Menu
-                self.video_menu=wx.Menu()
-                self.video_menu.Append(-1,"NULL")
-                self.video_menu.AppendSeparator()
-                self.video_menu.Append(-1,"NULL")
-                self.frame_menubar.Append(self.video_menu, "Video")
+                #self.video_menu=wx.Menu()
+                #self.video_menu.Append(-1,"NULL")
+                #self.video_menu.AppendSeparator()
+                #self.video_menu.Append(-1,"NULL")
+                #self.frame_menubar.Append(self.video_menu, "Video")
 
 
                 #  Tools Menu
-                self.tools_menu=wx.Menu()
-                self.tools_menu.Append(-1,"NULL")
-                self.tools_menu.AppendSeparator()
-                self.tools_menu.Append(-1,"NULL")
-                self.frame_menubar.Append(self.tools_menu, "Tools")
+##                self.tools_menu=wx.Menu()
+####                self.tools_menu.Append(-1,"NULL")
+##                self.tools_menu.AppendSeparator()
+##                self.tools_menu.Append(-1,"NULL")
+##                self.frame_menubar.Append(self.tools_menu, "Tools")
 
                 #  View Menu
-                self.view_menu=wx.Menu()
-                self.view_menu.Append(-1,"NULL")
-                self.view_menu.AppendSeparator()
-                self.view_menu.Append(-1,"NULL")
-                self.frame_menubar.Append(self.view_menu, "View")
+##                self.view_menu=wx.Menu()
+##                self.view_menu.Append(-1,"NULL")
+##                self.view_menu.AppendSeparator()
+##                self.view_menu.Append(-1,"NULL")
+##                self.frame_menubar.Append(self.view_menu, "View")
 
                 #  Help Menu
                 self.help_menu=wx.Menu()                
                 menu_feedback=self.help_menu.Append(-1,"&FeedBack")
                 self.help_menu.AppendSeparator()
-                self.help_menu.Append(-1,"NULL")
+##                self.help_menu.Append(-1,"NULL")
                 self.frame_menubar.Append(self.help_menu, "Help")
                 self.SetMenuBar(self.frame_menubar)
                 
@@ -123,13 +123,13 @@ class MyFrame(wx.Frame):
                 self.displaytime.SetFont(myfont)
 
                 #  pause button                              
-                self.pausebmp=wx.Bitmap("./VLC/Icons/pause.png",wx.BITMAP_TYPE_PNG)
-                self.pausebmp.SetSize(size=(40,40))                
+                pausebmp=wx.Bitmap("./VLC/Icons/pause.png",wx.BITMAP_TYPE_PNG)
+                pausebmp.SetSize(size=(40,40))                
                 #  play button
-                self.playbmp=wx.Bitmap("./VLC/Icons/play.png",wx.BITMAP_TYPE_PNG)                
-                self.playbmp.SetSize(size=(40,40))                
+                playbmp=wx.Bitmap("./VLC/Icons/play.png",wx.BITMAP_TYPE_PNG)                
+                playbmp.SetSize(size=(40,40))                
                 self.play   = pbtn.PlateButton(ctrlpanel)                            
-                self.play.SetBitmap(bmp=self.playbmp)                             
+                self.play.SetBitmap(bmp=playbmp)                             
                 
                 #  volume button
                 self.volume = pbtn.PlateButton(ctrlpanel)                
@@ -186,9 +186,9 @@ class MyFrame(wx.Frame):
 
                 SizerPart1=wx.BoxSizer(wx.VERTICAL)
                 
-                self.subpanel=Subtitle(self,-1)
+                self.subpanel=SubtitlePanel(self,-1)
                 self.Bind(wx.EVT_MENU, self.subpanel.OpenFile, op)
-                self.Bind(wx.EVT_MENU, self.subpanel.SaveFile, sa)
+                self.Bind(wx.EVT_MENU, self.SaveSubtitle, sa)
                 self.subpanel.SetMinSize((400,400))
                 self.subpanel.SetMaxSize((400,400))
                 
@@ -208,13 +208,16 @@ class MyFrame(wx.Frame):
                 BigSizer.SetMinSize((1120,650))
                 self.SetSizer(BigSizer)
                 self.SetMinSize((1120,650))
+
+                # bind the event of select item
+                self.subpanel.Bind(wx.EVT_LISTBOX_DCLICK,self.Select,self.subpanel.listBox)
                 
                 # finally create the timer, which updates the timeslider
                 self.timer = wx.Timer(self)
                 self.Bind(wx.EVT_TIMER, self.OnTimer, self.timer)
 
                 # VLC player controls
-                self.Instance = vlc.Instance('--subsdec-encoding=UTF-8','--freetype-font=PMingLiU')
+                self.Instance = vlc.Instance('--subsdec-encoding=GB18030','--freetype-font=PMingLiU')
                 self.player = self.Instance.media_player_new()
 
                 self.Bind(wx.EVT_CLOSE,self.OnExit)
@@ -222,9 +225,25 @@ class MyFrame(wx.Frame):
                 # Set the Fast Key
                 acceltbl=wx.AcceleratorTable([(wx.ACCEL_CTRL,ord('O'),1),(wx.ACCEL_CTRL,ord('C'),2),(wx.ACCEL_CTRL,ord('P'),3),(wx.ACCEL_CTRL,ord('A'),4),(wx.ACCEL_CTRL,ord('S'),5),(wx.ACCEL_CTRL,ord('F'),6),(wx.ACCEL_CTRL,ord('V'),7)])
                 self.SetAcceleratorTable(acceltbl)
+
+        def SaveSubtitle(self,evt):
+                self.subpanel.SaveFile(self.subpanel)
+                self.player.video_set_subtitle_file(self.subpanel.filename)
+
                 
-        def SetTheSpec(self,evt):
-                return 
+                
+        def Select(self,evt):
+                self.subpanel.ChooseOneItem(self.subpanel)
+                begintime=self.subpanel.begintime.GetValue()
+                endtime=self.subpanel.endtime.GetValue()                
+                tmp_begin=begintime.split(':')
+                tmp_end=endtime.split(':')
+                if(len(tmp_begin)==3):
+                        begin_sec=int(tmp_begin[0])*60*60+int(tmp_begin[1])*60+float(tmp_begin[2])
+                        self.Spec.GetLeftLex(self.Spec,begin_sec)
+                if(len(tmp_end)==3):
+                        end_sec=int(tmp_end[0])*60*60+int(tmp_end[1])*60+float(tmp_end[2])
+                        self.Spec.GetRightLex(self.Spec,end_sec)
 
 
         def OnExit(self, evt):
@@ -271,7 +290,7 @@ class MyFrame(wx.Frame):
                         self.select_dialog.ShowModal()
                         # Finally Play~FIXME: this should be made cross-platform
                         self.OnPlay(None)
-                        self.Spec.GetAddr(self.Spec,self.mediapath)
+                        self.Spec.GetAddr(self.Spec,self.mediapath)                        
                 else:
                         dlg.Destroy()
 
@@ -290,17 +309,25 @@ class MyFrame(wx.Frame):
                                 self.errorDialog("Unable to play.")
                         else:
                                 self.timer.Start(100)
+                                
 
         def OnPlayButton(self,evt):
+                pausebmp=wx.Bitmap("./VLC/Icons/pause.png",wx.BITMAP_TYPE_PNG)
+                pausebmp.SetSize(size=(40,40))
+
+                playbmp=wx.Bitmap("./VLC/Icons/play.png",wx.BITMAP_TYPE_PNG)                
+                playbmp.SetSize(size=(40,40))    
+                
                 if not self.player.get_media():
                         self.OnOpen(None)
+                        self.play.SetBitmap(bmp=pausebmp)
                 else:
                         self.OnPause(self)
                         if self.player.is_playing()==True:                                                           
-                                self.play.SetBitmap(bmp=self.pausebmp)
+                                self.play.SetBitmap(bmp=playbmp)
                                 
                         else:                                
-                                self.play.SetBitmap(bmp=self.playbmp)                                
+                                self.play.SetBitmap(bmp=pausebmp)                                
 
         def OnPause(self, evt):
                 """Pause the player.
@@ -328,7 +355,7 @@ class MyFrame(wx.Frame):
                 self.length_min=length_second/60
                 self.length_sec=length_second-self.length_min*60
 
-                # update the time on the slider
+                # update the time on the slider                
                 time = self.player.get_time()
                 self.timeslider.SetValue(time)
 
@@ -361,6 +388,14 @@ class MyFrame(wx.Frame):
                         str_length_sec=str(self.length_sec)
                 self.displaytime.SetLabel(str_min+":"+str_sec+"/"+str_length_min+":"+str_length_sec)
 
+                #spectoright
+                ll=self.Spec.GetLeft(self.Spec)
+                
+                if(ll!="-1"):
+                        self.subpanel.SetLeft(self.subpanel,ll)
+                rr=self.Spec.GetRight(self.Spec)
+                if(rr!="-1"):
+                        self.subpanel.SetRight(self.subpanel,rr)
                 
 
         def OnToggleVolume(self, evt):
@@ -507,6 +542,7 @@ class FeedBackDialog(wx.Dialog):
                 return self.mail.GetValue()
         def GetSuggestion(self):
                 return self.suggestion.GetValue()
+        
 
 class ShapedButton(wx.PyControl):
     def __init__(self, parent, normal, pressed=None, disabled=None):
@@ -576,6 +612,17 @@ class ShapedButton(wx.PyControl):
                 self.clicked = False
     def on_leave_window(self, event):
         self.clicked = False
+
+class SubtitlePanel(Subtitle):
+        def __init__(self,parent,id):
+                Subtitle.__init__(self,parent,id)
+
+        def SaveFile(self,event):
+                super(SubtitlePanel,self).SaveFile(self)
+                
+                
+        
+        
 
 
 

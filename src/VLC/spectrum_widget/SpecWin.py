@@ -2,8 +2,6 @@
 import wx
 from pylab import *
 
-import core.ffmpeg_decoder as fd
-import core.spectrum as sp
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -27,8 +25,6 @@ class ImageWindow(wx.ScrolledWindow):
         #ADD MOUSE DRAG EVENT TO REPLACE SCROLLING
         self.Bind(wx.EVT_LEFT_UP, self.OnLeftUp)
         self.Bind(wx.EVT_RIGHT_UP, self.OnRightUp)
-        self.timer = wx.Timer(self)
-        self.timer.Start(100)
         self.overlay=wx.Overlay()
         #ruler=RC.RulerCtrl(self, -1, pos=(0, np.size(specW, axis=0)), size=(np.size(specW , axis = 1),1),orient=wx.HORIZONTAL, style=wx.NO_BORDER)
         #ruler.SetFlip(flip=True)
@@ -149,7 +145,7 @@ class SpecPanel(wx.Panel):
         #ADD TWO BUTTONS TO MANIPULATE THE LEFT AND RIGHT BORDER
         self.button1 = wx.Button(self.panel, id=1, label='left', pos = (115,5), size = (30,25))
         self.button2 = wx.Button(self.panel, id=2, label='right', pos=(150,5), size = (30,25))
-        self.button3 = wx.Button(self.panel, id=3, label='open', pos=(80,5), size = (30,25))
+        self.button3 = wx.Button(self.panel, id=3, label='Start', pos=(80,5), size = (30,25))
         self.button1.Bind(wx.EVT_BUTTON, self.LeftButton)
         self.button2.Bind(wx.EVT_BUTTON, self.RightButton)
         self.button1.Bind(wx.EVT_BUTTON, self.LeftText)
@@ -165,7 +161,6 @@ class SpecPanel(wx.Panel):
 
 
         self.wind = ImageWindow(self)
-        self.wind.timer.Start(100)
         self.wind.SetBitmap(self.im.ConvertToBitmap())
         self.wind.SetScrollbars(1,0, self.im.GetWidth(), 200)
         wx.EVT_SLIDER(self.sld, self.sld.GetId(),self.sliderUpdate1)
@@ -174,9 +169,10 @@ class SpecPanel(wx.Panel):
         self.wind.Bind(wx.EVT_LEFT_UP, self.LeftText)
         self.wind.Bind(wx.EVT_RIGHT_UP, self.RightText)
         self.wind.Bind(wx.EVT_SCROLLWIN, self.MidText)
+        self.wind.Bind(wx.EVT_LEFT_UP, self.MidText)
+        self.wind.Bind(wx.EVT_RIGHT_UP, self.MidText)
         self.sld1.Bind(wx.EVT_SLIDER, self.sliderUpdate2)
         #self.wind.Bind(wx.EVT_TIMER, self.CurrText, self.wind.timer)
-        self.wind.Bind(wx.EVT_TIMER, self.OnTimer, self.wind.timer)
         self.wind.FitInside()
         #self.wind.SetScrollbars(1,0, self.im.GetWidth(), 200)
 
@@ -190,8 +186,8 @@ class SpecPanel(wx.Panel):
         self.SetMinSize((500,200))
         #self.Fit()
 
-    def OpenData(self,event):
-        file_wildcard = "All files(*.*)|*.*"
+    def OpenData(self,event, handle):
+        """file_wildcard = "All files(*.*)|*.*"
         dlg = wx.FileDialog(self, "Open file...",
             os.getcwd(),
             style = wx.OPEN,
@@ -203,8 +199,9 @@ class SpecPanel(wx.Panel):
         handle = spec.ostream.get_handle()
 
         dec.start()
-        spec.start()
-        Num = 0
+        spec.start()"""
+        self.handle = handle
+        """Num = 0
 
         while handle.more_data():
             iter = 0
@@ -232,14 +229,41 @@ class SpecPanel(wx.Panel):
                 specW = np.append(specW, vector, axis = 1)
                 list.append(vector)
             Num = Num + 1
-        return specW
+        return specW"""
 
     def GetAddr(self, event, path):
         self.addr = path
     
     def GetData(self,event):
+        Num = 0
 
-        self.specW = self.OpenData(self)
+        while self.handle.more_data():
+            iter = 0
+            q = []
+            pos, n, q = self.handle.read(1000, q)
+            for p in q:
+                if iter == 0:
+                    temp = p.T[::-1]
+                    vector = np.log(temp + 1)
+                else:
+                    temp = p.T[::-1]
+                    vector = np.append(vector, np.log(temp + 1), axis =1)
+                iter = iter +1
+                #plt.imshow(np.log(p.T+1))
+                #plt.show()
+            vector = vector/np.amax(vector)
+            vector = [vector, vector, vector]
+            vector = np.dstack(vector)
+            #plt.imsave(path, vector, cmap = cm.gray)
+            im = wx.ImageFromBuffer(int(np.size(vector, axis = 1)), int(np.size(vector, axis = 0)), np.uint8(vector))
+            if Num == 0:
+                self.specW = vector
+                list = [vector]
+            else:
+                self.specW = np.append(self.specW, vector, axis = 1)
+                list.append(vector)
+            Num = Num + 1
+
         self.spec = self.specW*255.0
             
         self.orim = wx.ImageFromBuffer(int(np.size(self.spec , axis = 1)), int(np.size(self.spec, axis = 0)), np.uint8(self.spec))
@@ -301,22 +325,50 @@ class SpecPanel(wx.Panel):
         self.textleft.Clear()
         if self.wind.LeftClickFlag ==1:
             time = self.wind.LeX/self.ratio/self.pos*200
-            self.textleft.WriteText(str(int(time/60/60))+":"+str(int(time/60%60))+":"+str(int(time%60)) + ":"+str(int(((round(time, 2) - int(time))*100))))
-        event.Skip()
+            lefttext=str(int(time/60/60))+":"+str(int(time/60%60))+":"+str(int(time%60)) + "."+str(int(((round(time, 2) - int(time))*100)))
+            self.leftstr=lefttext
+            self.textleft.WriteText(str(int(time/60/60))+":"+str(int(time/60%60))+":"+str(int(time%60)) + "."+str(int(((round(time, 2) - int(time))*100))))
+        
 
     def RightText(self, event):
         self.textright.Clear()
         if self.wind.RightClickFlag==1:
             time = self.wind.RiX/self.ratio/self.pos*200
-            self.textright.WriteText(str(int(time/60/60))+":"+str(int(time/60%60))+":"+str(int(time%60)) + ":"+str(int(((round(time, 2) - int(time))*100))))
-        event.Skip()
-
+            righttext=str(int(time/60/60))+":"+str(int(time/60%60))+":"+str(int(time%60)) + "."+str(int(((round(time, 2) - int(time))*100)))
+            self.rightstr=righttext
+            self.textright.WriteText(str(int(time/60/60))+":"+str(int(time/60%60))+":"+str(int(time%60)) + "."+str(int(((round(time, 2) - int(time))*100))))
+        
+        
+    def GetLeft(self,event):
+        try:
+            return self.leftstr
+        except:
+            return "-1"
+    def GetRight(self,event):
+        try:
+            return self.rightstr
+        except:
+            return "-1"
     def MidText(self, event):
         self.textmid.Clear()
         time = (-self.wind.CalcScrolledPosition(0,0)[0] + 150)/self.ratio*200.0/self.pos
         self.textmid.WriteText(str(int(time/60/60))+":"+str(int(time/60%60))+":"+str(int(time%60))+ ":"+str(int(((round(time, 2) - int(time))*100))))
         self.currx = -self.wind.CalcScrolledPosition(0,0)[0]
+        self.wind.Refresh()
         event.Skip()
+
+    def GetLeftLex(self,event,lefttime):
+        self.wind.LeftClickFlag =1    
+        self.wind.LeX=lefttime*self.ratio
+        self.wind.Scroll(self.wind.LeX - 50, 0)
+        self.LeftText(wx.EVT_LEFT_UP)
+        self.wind.Refresh()
+
+    def GetRightLex(self,event,righttime):
+        self.wind.RightClickFlag =1
+        self.wind.RiX=righttime*self.ratio
+        self.RightText(wx.EVT_RIGHT_UP)
+        self.wind.Refresh()
 
     """def CurrText(self, event):
         self.textcurr.Clear()
@@ -328,12 +380,10 @@ class SpecPanel(wx.Panel):
         self.textcurr.Clear()
         time = milisec
         self.textcurr.WriteText(str(int(time/1000/60/60)) +":" +str(int(time/1000/60%60)) + ":" +str(int(time/1000%60)) +":" +str(int(time%1000)))
+        self.wind.CurrPos = time/1000*self.ratio
+        self.wind.Refresh()
         
 
-    def OnTimer(self, event):
-        self.wind.CurrPos = self.wind.CurrPos + 1.5
-        self.Refresh()
-        event.Skip()
 
 if __name__=='__main__':
         app = wx.PySimpleApp()
