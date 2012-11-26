@@ -1,3 +1,4 @@
+#coding=utf-8
 from common.processor import processor
 from common.data_stream import data_stream
 import subprocess
@@ -23,6 +24,9 @@ class sub_generator(processor):
     def run(self):
         fout = open(self.outfile, 'w')
         count = 0
+        startupinfo = subprocess.STARTUPINFO()
+        startupinfo.dwFlags |= subprocess._subprocess.STARTF_USESHOWWINDOW
+
         while self.istream_handle.more_data():
             pos, n, seg = self.istream_handle.read(1)
             if not seg:
@@ -34,7 +38,7 @@ class sub_generator(processor):
             if self.lang_from:
                 tmp_file = tempfile.mktemp('.flac')
                 args = [constants.FFMPEG_PATH, '-v', '0', '-y', '-i', self.infile, '-ss', str(seg[0]-0.3), '-t', str(seg[1]-seg[0]+0.6), '-vn', '-ar', str(constants.GOOGLE_AUDIO_SAMPLE_RATE), '-ac', '1', '-f', 'flac', tmp_file]       
-                ffmpeg = subprocess.Popen(args)
+                ffmpeg = subprocess.Popen(args, startupinfo=startupinfo)
                 ffmpeg.wait()
                 url = 'https://www.google.com/speech-api/v1/recognize?xjerr=1&client=chromium&pfilter=2&lang=' + self.lang_from + '&maxresults=6'
                 length = os.path.getsize(tmp_file)

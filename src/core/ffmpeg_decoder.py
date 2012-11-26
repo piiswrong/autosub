@@ -14,7 +14,10 @@ class ffmpeg_decoder(processor):
         self.output_rate = output_rate
         
     def run(self):
-        ffmpeg = subprocess.Popen([constants.FFMPEG_PATH, '-v', '0', '-i', self.file_name, '-vn', '-ar', str(self.output_rate), '-ac', '1', '-f', 's16le', '-'], stdout = subprocess.PIPE)
+        startupinfo = subprocess.STARTUPINFO()
+        startupinfo.dwFlags |= subprocess._subprocess.STARTF_USESHOWWINDOW
+
+        ffmpeg = subprocess.Popen([constants.FFMPEG_PATH, '-v', '0', '-i', self.file_name, '-vn', '-ar', str(self.output_rate), '-ac', '1', '-f', 's16le', '-'], stdout = subprocess.PIPE, startupinfo=startupinfo)
         while True:
             s = ffmpeg.stdout.read(512)
             if not s:
