@@ -36,5 +36,3 @@ nosetests.xml
 .pydevproject
 
 *.srt
-
-src/*.exe
