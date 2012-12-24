@@ -3,7 +3,7 @@ from common.data_stream import *
 import numpy as np
 from common import constants
 import matplotlib.pyplot as plt
-
+import random
 
 class feature_extractor(processor_np):
     
@@ -22,26 +22,36 @@ class feature_extractor(processor_np):
         self.p_intervel = 0
         
     def work(self, buff, size, pos):
-#        plt.imshow(np.log(abs(buff)**2))
+        
+#        plt.imshow(np.log(abs(buff)**2+1))
 #        plt.show()
-        for i in xrange(self.feat_length/2, size - self.feat_length/2):
+        for i in xrange(size - self.feat_length + 1):
             if self.p_intervel == len(self.intervels):
-                self.noise.append(buff[i-2:i+3, :].reshape(-1))
+                self.noise.append(buff[i:i+self.feat_length, :].copy().reshape(-1))
             else:
                 if self.state == 0:
-                    self.noise.append(buff[i-2:i+3, :].reshape(-1))
-                    if (pos + i + 1 + self.feat_length/2)/self.input_rate >= self.intervels[self.p_intervel][0]:
+                    if (pos + i + self.feat_length)/self.input_rate >= self.intervels[self.p_intervel][0]:
                         self.state = 1
+                    else:
+                        self.noise.append(buff[i:i+self.feat_length, :].copy().reshape(-1))
+#                        print 'noise:', (pos+i)/self.input_rate                    
                 elif self.state == 1:
                     if (pos + i + 1)/self.input_rate >= self.intervels[self.p_intervel][0]:
                         self.state = 2
                 elif self.state == 2:
-                    if self.intervels[self.p_intervel][2]:
-                        self.speech.append(buff[i-2:i+3, :].reshape(-1))
-                        #print (pos + i)/self.input_rate
-                    if (pos + i + 1)/self.input_rate >= self.intervels[self.p_intervel][1]:
+                    if (pos + i + self.feat_length)/self.input_rate >= self.intervels[self.p_intervel][1]:
                         self.state = 3
+                    elif self.intervels[self.p_intervel][2]:
+                        self.speech.append(buff[i:i+self.feat_length, :].copy().reshape(-1))
+#                        if random.randint(0,0) == 0:
+#                            plt.subplot(121)
+#                            plt.imshow(np.log(abs(buff[i-self.half_length:i+self.half_length+1, :])**2+1))
+#                            plt.subplot(122)
+#                            plt.imshow(np.log(abs(buff)**2+1))
+#                            plt.show()
+#                        print 'speech:', (pos + i)/self.input_rate
+                    
                 elif self.state == 3:
-                    if (pos + i + 1 - self.feat_length/2)/self.input_rate >= self.intervels[self.p_intervel][1]:
+                    if (pos + i + 1)/self.input_rate >= self.intervels[self.p_intervel][1]:
                         self.state = 0
                         self.p_intervel = self.p_intervel + 1
